@@ -1,6 +1,7 @@
 from mutagen.mp3 import MP3
 from dev_tools import get_file_names_in_folder
 import tkinter as tk
+from tkinter import *
 
 
 class AudioTrack:
@@ -81,50 +82,38 @@ class App:
     def __init__(self, master):
         self.master = master
         self.listbox = tk.Listbox(self.master, width=100, height=30)
-        self.listbox.pack()
+        self.listbox.pack(fill=BOTH, expand=True)
 
-        self.button = tk.Button(self.master, text="Click me!", command=self.click_button)
+        self.scrollbar = Scrollbar(self.listbox)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+
+        self.listbox.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.listbox.yview)
+
+        self.button = tk.Button(self.master, text="Read folder", command=self.click_button)
         self.button.pack()
 
     def click_button(self):
-        self.listbox.insert(tk.END, 'hello world')
+        folder_path = input('Please, enter path to the folder with yours mp3 files: ')
+        # Search all mp3 files in folder
+        mp3_files = get_file_names_in_folder(folder_path, 'mp3')
 
+        count_of_files = len(mp3_files)
+        if count_of_files == 0:
+            self.listbox.insert(tk.END, 'No MP3 files found')
 
-folder_path = input('Please, enter path to the folder with yours mp3 files: ')
-# Search all mp3 files in folder
-mp3_files = get_file_names_in_folder(folder_path, 'mp3')
+        audio_tracks_list = []
 
-count_of_files = len(mp3_files)
-if count_of_files != 0:
-    print(f'{count_of_files} MP3 files found')
-else:
-    print('No MP3 files found')
+        for mp3_file in mp3_files:
+            audio_tracks_list.append(AudioTrackMp3(f'{folder_path}\\{mp3_file}'))
 
-audio_tracks_list = []
+        filter_mp3 = AudioTrackFilter()
+        filter_mp3.artist = 'Queen'
 
-print('Indexing')
+        for song in audio_tracks_list:
+            if filter_mp3 == song:
+                self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
 
-for mp3_file in mp3_files:
-    print('...............')
-    audio_tracks_list.append(AudioTrackMp3(f'{folder_path}\\{mp3_file}'))
-
-item_index = 0
-
-filter_mp3 = AudioTrackFilter()
-filter_mp3.artist = 'Queen'
-
-for song in audio_tracks_list:
-    if filter_mp3 == song:
-        print("-----------------------------------------")
-        print(f"Track    № {item_index + 1}")
-        print("Title:  ", song.title)
-        print("Artist: ", song.artist)
-        print("Genre:  ", song.genre)
-        print("Album:  ", song.album)
-        print("Format  ", song.file_type)
-        print("Year    ", song.year)
-        print("")
-        item_index += 1
 
 root = tk.Tk()
 root.geometry('620x500')
