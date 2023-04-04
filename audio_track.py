@@ -1,7 +1,4 @@
 from mutagen.mp3 import MP3
-from dev_tools import get_file_names_in_folder
-import tkinter as tk
-from tkinter import *
 
 
 class AudioTrack:
@@ -76,47 +73,3 @@ class AudioTrackMp3(AudioTrack):
             return y
         except ValueError:
             return -1
-
-
-class App:
-    def __init__(self, master):
-        self.master = master
-        self.listbox = tk.Listbox(self.master, width=100, height=30)
-        self.listbox.pack(fill=BOTH, expand=True)
-
-        self.scrollbar = Scrollbar(self.listbox)
-        self.scrollbar.pack(side=RIGHT, fill=Y)
-
-        self.listbox.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.config(command=self.listbox.yview)
-
-        self.button = tk.Button(self.master, text="Read folder", command=self.click_button)
-        self.button.pack()
-
-    def click_button(self):
-        folder_path = input('Please, enter path to the folder with yours mp3 files: ')
-        # Search all mp3 files in folder
-        mp3_files = get_file_names_in_folder(folder_path, 'mp3')
-
-        count_of_files = len(mp3_files)
-        if count_of_files == 0:
-            self.listbox.insert(tk.END, 'No MP3 files found')
-
-        audio_tracks_list = []
-
-        for mp3_file in mp3_files:
-            audio_tracks_list.append(AudioTrackMp3(f'{folder_path}\\{mp3_file}'))
-
-        filter_mp3 = AudioTrackFilter()
-        filter_mp3.artist = 'Queen'
-
-        for song in audio_tracks_list:
-            if filter_mp3 == song:
-                self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
-
-
-root = tk.Tk()
-root.geometry('620x500')
-
-app = App(root)
-root.mainloop()
