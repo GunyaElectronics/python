@@ -1,5 +1,6 @@
 from mutagen.mp3 import MP3
 from dev_tools import get_file_names_in_folder
+import tkinter as tk
 
 
 class AudioTrack:
@@ -76,6 +77,19 @@ class AudioTrackMp3(AudioTrack):
             return -1
 
 
+class App:
+    def __init__(self, master):
+        self.master = master
+        self.listbox = tk.Listbox(self.master, width=100, height=30)
+        self.listbox.pack()
+
+        self.button = tk.Button(self.master, text="Click me!", command=self.click_button)
+        self.button.pack()
+
+    def click_button(self):
+        self.listbox.insert(tk.END, 'hello world')
+
+
 folder_path = input('Please, enter path to the folder with yours mp3 files: ')
 # Search all mp3 files in folder
 mp3_files = get_file_names_in_folder(folder_path, 'mp3')
@@ -111,3 +125,9 @@ for song in audio_tracks_list:
         print("Year    ", song.year)
         print("")
         item_index += 1
+
+root = tk.Tk()
+root.geometry('620x500')
+
+app = App(root)
+root.mainloop()
