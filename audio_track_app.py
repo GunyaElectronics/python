@@ -16,14 +16,14 @@ class App:
         self.listbox.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.listbox.yview)
 
-        self.button = tk.Button(self.master, text="Read folder", command=self.click_button)
-        self.button.pack()
+        self.button_read = tk.Button(self.master, text="Read folder", command=self.click_button_read)
+        self.button_read.pack()
 
         self.entry = tk.Entry(self.master)
         self.entry.pack()
 
-    def click_button(self):
-        folder_path = 'D:\\Музика\\FullMetadata'  # input('Please, enter path to the folder with yours mp3 files: ')
+    def click_button_read(self):
+        folder_path = self.entry.get()
         # Search all mp3 files in folder
         mp3_files = get_file_names_in_folder(folder_path, 'mp3')
 
