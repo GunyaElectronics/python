@@ -2,16 +2,14 @@ from mutagen.mp3 import MP3
 
 
 class AudioTrack:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.audio = MP3(file_path)
-        self.title = self.audio['TIT2'].text[0] if 'TIT2' in self.audio else None
-        self.artist = self.audio['TPE1'].text[0] if 'TPE1' in self.audio else None
-        self.album = self.audio['TALB'].text[0] if 'TALB' in self.audio else None
-        self.album_artist = self.audio['TPE2'].text[0] if 'TPE2' in self.audio else None
-        self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
-        self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
-        self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
+    def __init__(self):
+        self.title = None
+        self.artist = None
+        self.album = None
+        self.album_artist = None
+        self.genre = None
+        self.year = None
+        self.track_number = None
 
 
 class AudioTrackFilter:
@@ -64,8 +62,17 @@ class AudioTrackFilter:
 
 class AudioTrackMp3(AudioTrack):
     def __init__(self, file_path):
-        super().__init__(file_path)
+        super().__init__()
         self.file_type = 'mp3'
+        self.file_path = file_path
+        self.audio = MP3(file_path)
+        self.title = self.audio['TIT2'].text[0] if 'TIT2' in self.audio else None
+        self.artist = self.audio['TPE1'].text[0] if 'TPE1' in self.audio else None
+        self.album = self.audio['TALB'].text[0] if 'TALB' in self.audio else None
+        self.album_artist = self.audio['TPE2'].text[0] if 'TPE2' in self.audio else None
+        self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
+        self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
+        self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
 
     def get_year_safe(self):
         try:
