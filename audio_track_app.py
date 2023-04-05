@@ -17,10 +17,13 @@ class App:
         self.scrollbar.config(command=self.listbox.yview)
 
         self.button_read = tk.Button(self.master, text="Read folder", command=self.click_button_read)
-        self.button_read.pack()
+        self.button_read.pack(side=RIGHT)
 
-        self.entry = tk.Entry(self.master)
-        self.entry.pack()
+        self.label = tk.Label(self.master, text='Enter folder path:')
+        self.label.pack(side=LEFT)
+
+        self.entry = tk.Entry(self.master, width=40)
+        self.entry.pack(side=LEFT)
 
     def click_button_read(self):
         folder_path = self.entry.get()
