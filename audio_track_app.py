@@ -1,19 +1,21 @@
 from dev_tools import get_file_names_in_folder
-import tkinter as tk
+import threading
+from audio_track import *
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import Progressbar
-from audio_track import *
-import threading
+import tkinter as tk
 
 
 class App:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self, master_ui):
 
+        # Algorithm elements
         self.filter_mp3 = AudioTrackFilter()
         self.audio_tracks_list = []
 
+        # UI elements
+        self.master = master_ui
         self.progress_bar = Progressbar(self.master, orient=HORIZONTAL, length=200, mode='determinate')
         self.progress_bar['value'] = 0
 
@@ -25,34 +27,43 @@ class App:
         self.listbox.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.listbox.yview)
 
-        self.button_read = tk.Button(self.master, text="Read folder", command=self.click_button_read, width=10)
-        self.button_apply = tk.Button(self.master, text="Apply filter", command=self.click_button_apply, width=10)
-        self.button_sort = tk.Button(self.master, text="Sort", command=self.click_button_read, width=10)
+        elements_width = 33
+        self.button_read = tk.Button(self.master, text="Read folder content", command=self.click_button_read,
+                                     width=elements_width)
+        self.button_apply = tk.Button(self.master, text="Apply filter", command=self.click_button_apply,
+                                      width=elements_width)
+        self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_read,
+                                     width=elements_width)
 
-        self.label = tk.Label(self.master, text='Enter folder path:')
+        options = ["Search all files", "Search mp3 only", "Search flac only"]
+        selected_option = tk.StringVar(value=options[0])
 
-        self.entry_path = tk.Entry(self.master, width=40)
-        self.entry_artist = tk.Entry(self.master, width=40)
-        self.entry_title = tk.Entry(self.master, width=40)
-        self.entry_genre = tk.Entry(self.master, width=40)
-        self.entry_year = tk.Entry(self.master, width=40)
+        self.option_menu = tk.OptionMenu(self.master, selected_option, *options)
+        self.option_menu.config(width=elements_width)
+
+        entry_width = 40
+        self.entry_path = tk.Entry(self.master, width=entry_width)
+        self.entry_artist = tk.Entry(self.master, width=entry_width)
+        self.entry_title = tk.Entry(self.master, width=entry_width)
+        self.entry_genre = tk.Entry(self.master, width=entry_width)
+        self.entry_year = tk.Entry(self.master, width=entry_width)
 
         # Draw window using pack method
         self.listbox.pack(fill=BOTH, expand=True)
-        self.progress_bar.pack(fill=BOTH)  # pady=10)
-        self.label.pack(side=LEFT)
-        self.entry_path.pack(side=LEFT)
-        self.button_read.pack(side=LEFT)
-        self.entry_artist.pack(side=TOP)
-        self.entry_title.pack(side=TOP)
-        self.entry_genre.pack(side=TOP)
-        self.entry_year.pack(side=TOP)
+        self.progress_bar.pack(fill=BOTH)
+        self.entry_path.pack(side=TOP)
+        self.button_read.pack()
+        self.entry_artist.pack()
+        self.entry_title.pack()
+        self.entry_genre.pack()
+        self.entry_year.pack()
         self.button_apply.pack()
         self.button_sort.pack()
-        self.entry_artist.insert(0, 'Artist')
-        self.entry_title.insert(0, 'Title')
-        self.entry_genre.insert(0, 'Genre')
-        self.entry_year.insert(0, 'Year')
+        self.option_menu.pack()
+
+        # Set default values
+        self.entry_path.insert(0, 'Enter folder path..')
+        self.set_filter_entry_default()
 
     def set_filter_entry_default(self):
         if self.entry_year.get() == '':
