@@ -1,4 +1,5 @@
 from mutagen.mp3 import MP3
+from mutagen.flac import FLAC
 
 
 class AudioTrack:
@@ -58,6 +59,15 @@ class AudioTrackFilter:
             return self._check_title(other) and self._check_artist(other) and self._check_genre(other) and \
                 (self.year_ignore or self.year_max > other.get_year_safe() > self.year_min)
         return False
+
+
+class AudioTrackFlac(AudioTrack):
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_type = 'flac'
+        self.file_path = file_path
+        self.audio = FLAC(file_path)
+        self.title = 'FLAC'
 
 
 class AudioTrackMp3(AudioTrack):
