@@ -11,7 +11,7 @@ class App:
     def __init__(self, master_ui):
 
         # Algorithm elements
-        self.filter_mp3 = AudioTrackFilter()
+        self.filter_metadata = AudioTrackFilter()
         self.audio_tracks_list = []
 
         # UI elements
@@ -78,7 +78,7 @@ class App:
     def draw_songs_list(self):
         self.listbox.delete(0, END)
         for song in self.audio_tracks_list:
-            if self.filter_mp3 == song:
+            if self.filter_metadata == song:
                 self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
 
     def click_button_read(self):
@@ -86,19 +86,19 @@ class App:
 
         def read_folder(app_self):
             folder_path = app_self.entry_path.get()
-            # Search all mp3 files in folder
-            mp3_files = get_file_names_in_folder(folder_path, 'mp3')
+            # Search all audio files in folder
+            audio_files = get_file_names_in_folder(folder_path, 'flac')
 
-            count_of_files = len(mp3_files)
+            count_of_files = len(audio_files)
             if count_of_files == 0:
-                app_self.listbox.insert(tk.END, 'No MP3 files found')
+                app_self.listbox.insert(tk.END, 'No audio files found')
 
             file_index = 0
-            for mp3_file in mp3_files:
+            for audio_file in audio_files:
                 percent = file_index * 100 / count_of_files
                 if app_self.progress_bar['value'] != percent:
                     app_self.progress_bar['value'] = percent
-                app_self.audio_tracks_list.append(AudioTrackMp3(f'{folder_path}\\{mp3_file}'))
+                app_self.audio_tracks_list.append(AudioTrackFlac(f'{folder_path}\\{audio_file}'))
                 file_index += 1
 
             app_self.progress_bar['value'] = 100
@@ -113,19 +113,19 @@ class App:
 
     def click_button_apply(self):
         self.set_filter_entry_default()
-        self.filter_mp3 = AudioTrackFilter()
+        self.filter_metadata = AudioTrackFilter()
 
         if self.entry_title.get() != 'Title':
-            self.filter_mp3.title = self.entry_title.get()
+            self.filter_metadata.title = self.entry_title.get()
         if self.entry_artist.get() != 'Artist':
-            self.filter_mp3.artist = self.entry_artist.get()
+            self.filter_metadata.artist = self.entry_artist.get()
         if self.entry_genre.get() != 'Genre':
-            self.filter_mp3.genre = self.entry_genre.get()
+            self.filter_metadata.genre = self.entry_genre.get()
         if self.entry_year.get() != 'Year':
             year = int(self.entry_year.get())
-            self.filter_mp3.year_ignore = False
-            self.filter_mp3.year_min = year - 1
-            self.filter_mp3.year_max = year + 1
+            self.filter_metadata.year_ignore = False
+            self.filter_metadata.year_min = year - 1
+            self.filter_metadata.year_max = year + 1
         self.draw_songs_list()
 
 
@@ -134,7 +134,7 @@ def main():
     root.geometry('720x600')
 
     app = App(root)
-    root.title('MP3 metadata analyzer')
+    root.title('Audio metadata analyzer')
     root.mainloop()
 
 
