@@ -101,7 +101,9 @@ class App:
             if count_of_files == 0:
                 app_self.listbox.insert(tk.END, 'No audio files found')
 
+            app_self.audio_tracks_list[:] = []
             file_index = 0
+
             for audio_file in audio_files:
                 percent = file_index * 100 / count_of_files
                 if app_self.progress_bar['value'] != percent:
