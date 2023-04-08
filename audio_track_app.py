@@ -35,10 +35,12 @@ class App:
         self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_read,
                                      width=elements_width)
 
-        options = ["Search all files", "Search mp3 only", "Search flac only"]
-        selected_option = tk.StringVar(value=options[0])
+        self.file_types = ['mp3', 'flac']
+        self.options = ["Search all files", "Search mp3 only", "Search flac only"]
+        self.selected_option = tk.StringVar(value=self.options[0])
 
-        self.option_menu = tk.OptionMenu(self.master, selected_option, *options)
+        self.selected_option.trace('w', self.option_changed)
+        self.option_menu = tk.OptionMenu(self.master, self.selected_option, *self.options)
         self.option_menu.config(width=elements_width)
 
         entry_width = 40
@@ -52,6 +54,7 @@ class App:
         self.listbox.pack(fill=BOTH, expand=True)
         self.progress_bar.pack(fill=BOTH)
         self.entry_path.pack(side=TOP)
+        self.option_menu.pack()
         self.button_read.pack()
         self.entry_artist.pack()
         self.entry_title.pack()
@@ -59,11 +62,19 @@ class App:
         self.entry_year.pack()
         self.button_apply.pack()
         self.button_sort.pack()
-        self.option_menu.pack()
 
         # Set default values
         self.entry_path.insert(0, 'Enter folder path..')
         self.set_filter_entry_default()
+
+    def option_changed(self, *args):
+        opt = self.selected_option.get()
+        if opt == 'Search all files':
+            self.file_types = ['mp3', 'flac']
+        elif opt == 'Search mp3 only':
+            self.file_types = ['mp3']
+        else:
+            self.file_types = ['flac']
 
     def set_filter_entry_default(self):
         if self.entry_year.get() == '':
@@ -87,7 +98,7 @@ class App:
         def read_folder(app_self):
             folder_path = app_self.entry_path.get()
             # Search all audio files in folder
-            audio_files = get_file_names_in_folder(folder_path, 'flac')
+            audio_files = get_file_names_in_folder(folder_path, self.file_types)
 
             count_of_files = len(audio_files)
             if count_of_files == 0:
@@ -98,7 +109,9 @@ class App:
                 percent = file_index * 100 / count_of_files
                 if app_self.progress_bar['value'] != percent:
                     app_self.progress_bar['value'] = percent
-                app_self.audio_tracks_list.append(AudioTrackFlac(f'{folder_path}\\{audio_file}'))
+                audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
+                    AudioTrackFlac(f'{folder_path}\\{audio_file}')
+                app_self.audio_tracks_list.append(audio_metadata_item)
                 file_index += 1
 
             app_self.progress_bar['value'] = 100

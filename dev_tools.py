@@ -37,7 +37,15 @@ def calculate_crc32(file_name, print_enable=False):
 
 
 def get_file_names_in_folder(directory, fileendwith=None):
-    return [f for f in os.listdir(directory) if fileendwith is None or f.endswith(fileendwith)]
+    if fileendwith is None:
+        return []
+
+    file_names_list = []
+    for f in os.listdir(directory):
+        for key in fileendwith:
+            if f.endswith(key):
+                file_names_list.append(f)
+    return file_names_list
 
 
 def file_size(file_name):
