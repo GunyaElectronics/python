@@ -32,7 +32,7 @@ class App:
                                      width=elements_width)
         self.button_apply = tk.Button(self.master, text="Apply filter", command=self.click_button_apply,
                                       width=elements_width)
-        self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_read,
+        self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_sort,
                                      width=elements_width)
         self.file_types_dict = {'Search all files': ['mp3', 'flac'],
                                 'Search mp3 only': ['mp3'],
@@ -88,6 +88,9 @@ class App:
         for song in self.audio_tracks_list:
             if self.filter_metadata == song:
                 self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
+
+    def click_button_sort(self):
+        self.draw_songs_list()
 
     def click_button_read(self):
         self.set_filter_entry_default()

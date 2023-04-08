@@ -94,3 +94,7 @@ class AudioTrackMp3(AudioTrack):
         self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
+
+
+def sort_audio_tracks_list(songs_list, params):
+    return songs_list
