@@ -34,9 +34,12 @@ class App:
                                       width=elements_width)
         self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_read,
                                      width=elements_width)
-
-        self.file_types = ['mp3', 'flac']
-        self.options = ["Search all files", "Search mp3 only", "Search flac only"]
+        self.file_types_dict = {'Search all files': ['mp3', 'flac'],
+                                'Search mp3 only': ['mp3'],
+                                'Search flac only': ['flac']
+                                }
+        self.file_types = self.file_types_dict['Search all files']
+        self.options = list(self.file_types_dict.keys())
         self.selected_option = tk.StringVar(value=self.options[0])
 
         self.selected_option.trace('w', self.option_changed)
@@ -68,13 +71,7 @@ class App:
         self.set_filter_entry_default()
 
     def option_changed(self, *args):
-        opt = self.selected_option.get()
-        if opt == 'Search all files':
-            self.file_types = ['mp3', 'flac']
-        elif opt == 'Search mp3 only':
-            self.file_types = ['mp3']
-        else:
-            self.file_types = ['flac']
+        self.file_types = self.file_types_dict[self.selected_option.get()]
 
     def set_filter_entry_default(self):
         if self.entry_year.get() == '':
