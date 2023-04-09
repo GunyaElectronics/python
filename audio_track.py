@@ -1,4 +1,5 @@
 from mutagen.mp3 import MP3
+from mutagen.flac import FLAC
 
 
 class AudioTrack:
@@ -10,6 +11,13 @@ class AudioTrack:
         self.genre = None
         self.year = None
         self.track_number = None
+
+    def get_year_safe(self):
+        try:
+            y = int(str(self.year))
+            return y
+        except ValueError:
+            return -1
 
 
 class AudioTrackFilter:
@@ -28,21 +36,21 @@ class AudioTrackFilter:
         if not self.title:
             return True
         if self.title_part:
-            return audio_track.title in self.title
+            return self.title in audio_track.title
         return self.title == audio_track.title
 
     def _check_artist(self, audio_track):
         if not self.artist:
             return True
         if self.artist_part:
-            return audio_track.artist in self.artist
+            return self.artist in audio_track.artist
         return self.artist == audio_track.artist
 
     def _check_genre(self, audio_track):
         if not self.genre:
             return True
         if self.genre_part:
-            return audio_track.genre in self.genre
+            return self.genre in audio_track.genre
         return self.genre == audio_track.genre
 
     def __eq__(self, other):
@@ -54,10 +62,23 @@ class AudioTrackFilter:
                 (not self.genre or self.genre == other.genre) and \
                 (not self.year_min or self.year_min == other.year_min) and \
                 (not self.year_max or self.year_max == other.year_max)
-        elif isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3):
+        elif isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
             return self._check_title(other) and self._check_artist(other) and self._check_genre(other) and \
                 (self.year_ignore or self.year_max > other.get_year_safe() > self.year_min)
         return False
+
+
+class AudioTrackFlac(AudioTrack):
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_type = 'flac'
+        self.file_path = file_path
+        self.audio = FLAC(file_path)
+        self.title = self.audio['TITLE'][0] if 'TITLE' in self.audio else None
+        self.artist = self.audio['ARTIST'][0] if 'ARTIST' in self.audio else None
+        self.album = self.audio['ALBUM'][0] if 'ALBUM' in self.audio else None
+        self.genre = self.audio['GENRE'][0] if 'GENRE' in self.audio else None
+        self.year = self.audio['DATE'][0] if 'DATE' in self.audio else None
 
 
 class AudioTrackMp3(AudioTrack):
@@ -74,9 +95,6 @@ class AudioTrackMp3(AudioTrack):
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
 
-    def get_year_safe(self):
-        try:
-            y = int(str(self.year))
-            return y
-        except ValueError:
-            return -1
+
+def sort_audio_tracks_list(songs_list, params):
+    return songs_list
