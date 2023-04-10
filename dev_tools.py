@@ -12,8 +12,8 @@ class MyAudioExtractor:
 
     def convert_to_mp3(self):
         try:
-            video = mp.VideoFileClip(self.file)
-            print(f'The input file is {self.file}. Try convert to the {self.file_result}')
+            video = mp.VideoFileClip(self.file_in)
+            print(f'The input file is {self.file_in}. Try convert to the {self.file_result}')
             video.audio.write_audiofile(self.file_result)
         except FileExistsError:
             print('File already exist')
