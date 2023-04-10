@@ -62,10 +62,9 @@ class AudioTrackFilter:
                 (not self.genre or self.genre == other.genre) and \
                 (not self.year_min or self.year_min == other.year_min) and \
                 (not self.year_max or self.year_max == other.year_max)
-        elif isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
+        else: # isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
             return self._check_title(other) and self._check_artist(other) and self._check_genre(other) and \
                 (self.year_ignore or self.year_max > other.get_year_safe() > self.year_min)
-        return False
 
 
 class AudioTrackFlac(AudioTrack):
