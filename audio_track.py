@@ -19,6 +19,9 @@ class AudioTrack:
         except ValueError:
             return -1
 
+    def __repr__(self):
+        return f"AudioTrack({self.title}, {self.artist}, {self.album}, {self.album_artist}, {self.genre})"
+
 
 class AudioTrackFilter:
     def __init__(self):

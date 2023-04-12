@@ -90,6 +90,7 @@ class App:
                 self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
 
     def click_button_sort(self):
+        self.audio_tracks_list = sorted(self.audio_tracks_list, key=lambda track: track.artist)
         self.draw_songs_list()
 
     def click_button_read(self):
