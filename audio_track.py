@@ -1,5 +1,6 @@
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
+import operator
 
 
 class AudioTrack:
@@ -98,5 +99,5 @@ class AudioTrackMp3(AudioTrack):
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
 
 
-def sort_audio_tracks_list(songs_list, params):
-    return songs_list
+def sort_audio_tracks_list(songs_list, sort_by):
+    return sorted(songs_list, key=operator.attrgetter(sort_by))
