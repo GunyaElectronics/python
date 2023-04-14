@@ -39,12 +39,19 @@ class App:
                                 'Search flac only': ['flac']
                                 }
         self.file_types = self.file_types_dict['Search all files']
-        self.options = list(self.file_types_dict.keys())
-        self.selected_option = tk.StringVar(value=self.options[0])
+        self.file_type_options = list(self.file_types_dict.keys())
+        self.selected_file_option = tk.StringVar(value=self.file_type_options[0])
 
-        self.selected_option.trace('w', self.option_changed)
-        self.option_menu = tk.OptionMenu(self.master, self.selected_option, *self.options)
-        self.option_menu.config(width=elements_width)
+        self.selected_file_option.trace('w', self.file_type_option_changed)
+        self.option_selected_file_menu = tk.OptionMenu(self.master, self.selected_file_option, *self.file_type_options)
+        self.option_selected_file_menu.config(width=elements_width)
+
+        self.sort_by_options = ['Artist', 'Title', 'Genre', 'Album']
+        self.sort_by = self.sort_by_options[0].lower()
+        self.selected_sort_by_option = tk.StringVar(value=self.sort_by_options[0])
+        self.selected_sort_by_option.trace('w', self.sort_by_option_changed)
+        self.option_sort_by_menu = tk.OptionMenu(self.master, self.selected_sort_by_option, *self.sort_by_options)
+        self.option_sort_by_menu.config(width=elements_width)
 
         entry_width = 40
         self.entry_path = tk.Entry(self.master, width=entry_width)
@@ -57,21 +64,25 @@ class App:
         self.listbox.pack(fill=BOTH, expand=True)
         self.progress_bar.pack(fill=BOTH)
         self.entry_path.pack(side=TOP)
-        self.option_menu.pack()
+        self.option_selected_file_menu.pack()
         self.button_read.pack()
         self.entry_artist.pack()
         self.entry_title.pack()
         self.entry_genre.pack()
         self.entry_year.pack()
         self.button_apply.pack()
+        self.option_sort_by_menu.pack()
         self.button_sort.pack()
 
         # Set default values
         self.entry_path.insert(0, 'Enter folder path..')
         self.set_filter_entry_default()
 
-    def option_changed(self, *args):
-        self.file_types = self.file_types_dict[self.selected_option.get()]
+    def sort_by_option_changed(self, *args):
+        self.sort_by = self.selected_sort_by_option.get().lower()
+
+    def file_type_option_changed(self, *args):
+        self.file_types = self.file_types_dict[self.selected_file_option.get()]
 
     def set_filter_entry_default(self):
         if self.entry_year.get() == '':
@@ -90,6 +101,7 @@ class App:
                 self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
 
     def click_button_sort(self):
+        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.sort_by)
         self.draw_songs_list()
 
     def click_button_read(self):
