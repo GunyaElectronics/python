@@ -1,10 +1,11 @@
 from dev_tools import get_file_names_in_folder
-import threading
 from audio_track import *
+import tkinter as tk
 from tkinter import *
 from tkinter import messagebox, filedialog
 from tkinter.ttk import Progressbar
-import tkinter as tk
+from tkinter import ttk
+import threading
 
 
 class App:
@@ -17,8 +18,20 @@ class App:
         # UI elements
         self.master = master_ui  # Main window
 
-        self.frm_visual_data = tk.Frame(self.master)  # Frame with listbox, scroll bar and progress bar.
-        self.frm_buttons = tk.Frame(self.master)  # Frame with all control buttons and menus
+        self.ntb_base = ttk.Notebook(self.master)  # Notebook for select frame of the app
+
+        self.frm_tab_songs = tk.Frame(self.ntb_base)
+        self.frm_tab_playlist = tk.Frame(self.ntb_base)
+        self.frm_tab_download = tk.Frame(self.ntb_base)
+        self.frm_tab_edit = tk.Frame(self.ntb_base)
+
+        self.ntb_base.add(self.frm_tab_songs, text='Your Songs')
+        self.ntb_base.add(self.frm_tab_playlist, text='Playlist')
+        self.ntb_base.add(self.frm_tab_download, text='Download')
+        self.ntb_base.add(self.frm_tab_edit, text='Edit')
+
+        self.frm_visual_data = tk.Frame(self.frm_tab_songs)  # Frame with listbox, scroll bar and progress bar.
+        self.frm_buttons = tk.Frame(self.frm_tab_songs)  # Frame with all control buttons and menus
 
         self.progress_bar = Progressbar(self.frm_visual_data, orient=HORIZONTAL, length=200, mode='determinate')
         self.progress_bar['value'] = 0
@@ -66,6 +79,7 @@ class App:
         self.ent_year = tk.Entry(self.frm_buttons, width=entry_width)
 
         # Draw window using pack method
+        self.ntb_base.pack(fill='both', expand=True)
         self.frm_visual_data.pack(side=LEFT, fill=BOTH, expand=True)
         self.frm_buttons.pack()
         self.listbox.pack(fill=BOTH, expand=True)
