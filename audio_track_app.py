@@ -15,18 +15,15 @@ class App:
         self.audio_tracks_list = []
 
         # UI elements
-        self.master = master_ui
+        self.master = master_ui  # Main window
 
-        self.visual_data_frame = tk.Frame(self.master)
-        self.visual_data_frame.pack(side=LEFT, fill=BOTH, expand=True)
+        self.frm_visual_data = tk.Frame(self.master)  # Frame with listbox, scroll bar and progress bar.
+        self.frm_buttons = tk.Frame(self.master)  # Frame with all control buttons and menus
 
-        self.buttons_frame = tk.Frame(self.master)
-        self.buttons_frame.pack()
-
-        self.progress_bar = Progressbar(self.visual_data_frame, orient=HORIZONTAL, length=200, mode='determinate')
+        self.progress_bar = Progressbar(self.frm_visual_data, orient=HORIZONTAL, length=200, mode='determinate')
         self.progress_bar['value'] = 0
 
-        self.listbox = tk.Listbox(self.visual_data_frame, width=100, height=30)
+        self.listbox = tk.Listbox(self.frm_visual_data, width=100, height=30)
 
         self.scrollbar = Scrollbar(self.listbox)
         self.scrollbar.pack(side=RIGHT, fill=Y)
@@ -35,12 +32,12 @@ class App:
         self.scrollbar.config(command=self.listbox.yview)
 
         elements_width = 33
-        self.button_read = tk.Button(self.buttons_frame, text="Read folder content", command=self.click_button_read,
-                                     width=elements_width)
-        self.button_apply = tk.Button(self.buttons_frame, text="Apply filter", command=self.click_button_apply,
-                                      width=elements_width)
-        self.button_sort = tk.Button(self.buttons_frame, text="Sort songs", command=self.click_button_sort,
-                                     width=elements_width)
+        self.btn_read = tk.Button(self.frm_buttons, text="Read folder content", command=self.click_btn_read,
+                                  width=elements_width)
+        self.btn_apply = tk.Button(self.frm_buttons, text="Apply filter", command=self.click_btn_apply,
+                                   width=elements_width)
+        self.btn_sort = tk.Button(self.frm_buttons, text="Sort songs", command=self.click_btn_sort,
+                                  width=elements_width)
         self.file_types_dict = {'Search all files': ['mp3', 'flac'],
                                 'Search mp3 only': ['mp3'],
                                 'Search flac only': ['flac']
@@ -50,39 +47,42 @@ class App:
         self.selected_file_option = tk.StringVar(value=self.file_type_options[0])
 
         self.selected_file_option.trace('w', self.file_type_option_changed)
-        self.option_selected_file_menu = tk.OptionMenu(self.buttons_frame, self.selected_file_option, *self.file_type_options)
+        self.option_selected_file_menu = tk.OptionMenu(self.frm_buttons, self.selected_file_option,
+                                                       *self.file_type_options)
         self.option_selected_file_menu.config(width=elements_width)
 
         self.sort_by_options = ['Artist', 'Title', 'Genre', 'Album']
         self.sort_by = self.sort_by_options[0].lower()
         self.selected_sort_by_option = tk.StringVar(value=self.sort_by_options[0])
         self.selected_sort_by_option.trace('w', self.sort_by_option_changed)
-        self.option_sort_by_menu = tk.OptionMenu(self.buttons_frame, self.selected_sort_by_option, *self.sort_by_options)
-        self.option_sort_by_menu.config(width=elements_width)
+        self.opt_sort_by_menu = tk.OptionMenu(self.frm_buttons, self.selected_sort_by_option, *self.sort_by_options)
+        self.opt_sort_by_menu.config(width=elements_width)
 
         entry_width = 40
-        self.entry_path = tk.Entry(self.buttons_frame, width=entry_width)
-        self.entry_artist = tk.Entry(self.buttons_frame, width=entry_width)
-        self.entry_title = tk.Entry(self.buttons_frame, width=entry_width)
-        self.entry_genre = tk.Entry(self.buttons_frame, width=entry_width)
-        self.entry_year = tk.Entry(self.buttons_frame, width=entry_width)
+        self.ent_path = tk.Entry(self.frm_buttons, width=entry_width)
+        self.ent_artist = tk.Entry(self.frm_buttons, width=entry_width)
+        self.ent_title = tk.Entry(self.frm_buttons, width=entry_width)
+        self.ent_genre = tk.Entry(self.frm_buttons, width=entry_width)
+        self.ent_year = tk.Entry(self.frm_buttons, width=entry_width)
 
         # Draw window using pack method
+        self.frm_visual_data.pack(side=LEFT, fill=BOTH, expand=True)
+        self.frm_buttons.pack()
         self.listbox.pack(fill=BOTH, expand=True)
         self.progress_bar.pack(fill=BOTH)
-        self.entry_path.pack(side=TOP)
+        self.ent_path.pack(side=TOP)
         self.option_selected_file_menu.pack()
-        self.button_read.pack()
-        self.entry_artist.pack()
-        self.entry_title.pack()
-        self.entry_genre.pack()
-        self.entry_year.pack()
-        self.button_apply.pack()
-        self.option_sort_by_menu.pack()
-        self.button_sort.pack()
+        self.btn_read.pack()
+        self.ent_artist.pack()
+        self.ent_title.pack()
+        self.ent_genre.pack()
+        self.ent_year.pack()
+        self.btn_apply.pack()
+        self.opt_sort_by_menu.pack()
+        self.btn_sort.pack()
 
         # Set default values
-        self.entry_path.insert(0, 'Enter folder path..')
+        self.ent_path.insert(0, 'Enter folder path..')
         self.set_filter_entry_default()
 
     def sort_by_option_changed(self, *args):
@@ -92,14 +92,14 @@ class App:
         self.file_types = self.file_types_dict[self.selected_file_option.get()]
 
     def set_filter_entry_default(self):
-        if self.entry_year.get() == '':
-            self.entry_year.insert(0, 'Year')
-        if self.entry_title.get() == '':
-            self.entry_title.insert(0, 'Title')
-        if self.entry_artist.get() == '':
-            self.entry_artist.insert(0, 'Artist')
-        if self.entry_genre.get() == '':
-            self.entry_genre.insert(0, 'Genre')
+        if self.ent_year.get() == '':
+            self.ent_year.insert(0, 'Year')
+        if self.ent_title.get() == '':
+            self.ent_title.insert(0, 'Title')
+        if self.ent_artist.get() == '':
+            self.ent_artist.insert(0, 'Artist')
+        if self.ent_genre.get() == '':
+            self.ent_genre.insert(0, 'Genre')
 
     def draw_songs_list(self):
         self.listbox.delete(0, END)
@@ -107,20 +107,20 @@ class App:
             if self.filter_metadata == song:
                 self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
 
-    def click_button_sort(self):
+    def click_btn_sort(self):
         self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.sort_by)
         self.draw_songs_list()
 
-    def click_button_read(self):
+    def click_btn_read(self):
         folder_path = ''
         try:
-            folder_path = self.entry_path.get()
+            folder_path = self.ent_path.get()
             audio_files = get_file_names_in_folder(folder_path, self.file_types)
         except FileNotFoundError:
-            print('Exception')
+            # Invalid path, so we need to run file dialog.
             folder_path = filedialog.askdirectory()
-            self.entry_path.delete(0, 'end')
-            self.entry_path.insert(0, folder_path)
+            self.ent_path.delete(0, 'end')
+            self.ent_path.insert(0, folder_path)
             audio_files = get_file_names_in_folder(folder_path, self.file_types)
         self.set_filter_entry_default()
 
@@ -151,18 +151,18 @@ class App:
         thread = threading.Thread(target=read_folder, args=(self,))
         thread.start()
 
-    def click_button_apply(self):
+    def click_btn_apply(self):
         self.set_filter_entry_default()
         self.filter_metadata = AudioTrackFilter()
 
-        if self.entry_title.get() != 'Title':
-            self.filter_metadata.title = self.entry_title.get()
-        if self.entry_artist.get() != 'Artist':
-            self.filter_metadata.artist = self.entry_artist.get()
-        if self.entry_genre.get() != 'Genre':
-            self.filter_metadata.genre = self.entry_genre.get()
-        if self.entry_year.get() != 'Year':
-            year = int(self.entry_year.get())
+        if self.ent_title.get() != 'Title':
+            self.filter_metadata.title = self.ent_title.get()
+        if self.ent_artist.get() != 'Artist':
+            self.filter_metadata.artist = self.ent_artist.get()
+        if self.ent_genre.get() != 'Genre':
+            self.filter_metadata.genre = self.ent_genre.get()
+        if self.ent_year.get() != 'Year':
+            year = int(self.ent_year.get())
             self.filter_metadata.year_ignore = False
             self.filter_metadata.year_min = year - 1
             self.filter_metadata.year_max = year + 1
