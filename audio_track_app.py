@@ -2,7 +2,7 @@ from dev_tools import get_file_names_in_folder
 import threading
 from audio_track import *
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter.ttk import Progressbar
 import tkinter as tk
 
@@ -112,13 +112,19 @@ class App:
         self.draw_songs_list()
 
     def click_button_read(self):
+        folder_path = ''
+        try:
+            folder_path = self.entry_path.get()
+            audio_files = get_file_names_in_folder(folder_path, self.file_types)
+        except FileNotFoundError:
+            print('Exception')
+            folder_path = filedialog.askdirectory()
+            self.entry_path.delete(0, 'end')
+            self.entry_path.insert(0, folder_path)
+            audio_files = get_file_names_in_folder(folder_path, self.file_types)
         self.set_filter_entry_default()
 
         def read_folder(app_self):
-            folder_path = app_self.entry_path.get()
-            # Search all audio files in folder
-            audio_files = get_file_names_in_folder(folder_path, self.file_types)
-
             count_of_files = len(audio_files)
             if count_of_files == 0:
                 app_self.listbox.insert(tk.END, 'No audio files found')
