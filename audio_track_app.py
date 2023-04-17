@@ -1,53 +1,11 @@
 from dev_tools import get_file_names_in_folder
+from audio_track_ui import *
 from audio_track import *
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox, filedialog
-from tkinter.ttk import Progressbar
-from tkinter import ttk
 import threading
-
-
-class DefaultUiFrame:
-    def __init__(self, frm_master):
-        self.frm_visual = tk.Frame(frm_master)  # Frame with visual info, like listbox, scroll and progress bars.
-        self.frm_buttons = tk.Frame(frm_master)  # Frame with your all control buttons and text inputs.
-
-    def pack(self):
-        self.frm_visual.pack(side=LEFT, fill=BOTH, expand=True)
-        self.frm_buttons.pack()
-
-
-class FrameWithListbox(DefaultUiFrame):
-    def __init__(self, frm_master):
-        super().__init__(frm_master)
-        self.lst = tk.Listbox(self.frm_visual, width=100, height=30)
-
-        self.scrollbar = Scrollbar(self.lst)
-        self.scrollbar.pack(side=RIGHT, fill=Y)
-
-        self.lst.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.config(command=self.lst.yview)
-
-    def pack(self):
-        super().pack()
-
-
-class SongsUiFrame(FrameWithListbox):
-    def __init__(self, frm_master):
-        super().__init__(frm_master)
-        self.prg = Progressbar(self.frm_visual, orient=HORIZONTAL, length=200, mode='determinate')
-        self.prg['value'] = 0
-
-
-class PlaylistUiFrame(FrameWithListbox):
-    def __init__(self, frm_master):
-        super().__init__(frm_master)
 
 
 class App:
     def __init__(self, master_ui):
-
         # Algorithm elements
         self.filter_metadata = AudioTrackFilter()
         self.audio_tracks_list = []
@@ -55,137 +13,88 @@ class App:
         # UI elements
         self.master = master_ui  # Main window
 
-        self.ntb_base = ttk.Notebook(self.master)  # Notebook for select frame of the app
-
-        self.frm_tab_songs = tk.Frame(self.ntb_base)
-        self.frm_tab_playlist = tk.Frame(self.ntb_base)
-        self.frm_tab_download = tk.Frame(self.ntb_base)
-        self.frm_tab_edit = tk.Frame(self.ntb_base)
-
-        # Main window frames
-        self.ntb_base.add(self.frm_tab_songs, text='Your Songs')
-        self.ntb_base.add(self.frm_tab_playlist, text='Playlist')
-        self.ntb_base.add(self.frm_tab_download, text='Download')
-        self.ntb_base.add(self.frm_tab_edit, text='Edit')
-
-        self.songs = SongsUiFrame(self.frm_tab_songs)
-        self.playlist = PlaylistUiFrame(self.frm_tab_playlist)
-
-
-        elements_width = 33
-        self.btn_read = tk.Button(self.frm_sort_buttons, text="Read folder content", command=self.click_btn_read,
-                                  width=elements_width)
-        self.btn_apply = tk.Button(self.frm_sort_buttons, text="Apply filter", command=self.click_btn_apply,
-                                   width=elements_width)
-        self.btn_sort = tk.Button(self.frm_sort_buttons, text="Sort songs", command=self.click_btn_sort,
-                                  width=elements_width)
-        self.file_types_dict = {'Search all files': ['mp3', 'flac'],
-                                'Search mp3 only': ['mp3'],
-                                'Search flac only': ['flac']
-                                }
-        self.file_types = self.file_types_dict['Search all files']
-        self.file_type_options = list(self.file_types_dict.keys())
-        self.selected_file_option = tk.StringVar(value=self.file_type_options[0])
-
-        self.selected_file_option.trace('w', self.file_type_option_changed)
-        self.option_selected_file_menu = tk.OptionMenu(self.frm_sort_buttons, self.selected_file_option,
-                                                       *self.file_type_options)
-        self.option_selected_file_menu.config(width=elements_width)
-
-        self.sort_by_options = ['Artist', 'Title', 'Genre', 'Album']
-        self.sort_by = self.sort_by_options[0].lower()
-        self.selected_sort_by_option = tk.StringVar(value=self.sort_by_options[0])
-        self.selected_sort_by_option.trace('w', self.sort_by_option_changed)
-        self.opt_sort_by_menu = tk.OptionMenu(self.frm_sort_buttons, self.selected_sort_by_option, *self.sort_by_options)
-        self.opt_sort_by_menu.config(width=elements_width)
-
-        entry_width = 40
-        self.ent_path = tk.Entry(self.frm_sort_buttons, width=entry_width)
-        self.ent_artist = tk.Entry(self.frm_sort_buttons, width=entry_width)
-        self.ent_title = tk.Entry(self.frm_sort_buttons, width=entry_width)
-        self.ent_genre = tk.Entry(self.frm_sort_buttons, width=entry_width)
-        self.ent_year = tk.Entry(self.frm_sort_buttons, width=entry_width)
+        # Songs tab UI
+        self.songs = SongsUiFrame(self.master.frm_tab_songs, self.click_btn_read, self.click_btn_apply,
+                                  self.click_btn_sort, self.file_type_option_changed, self.sort_by_option_changed)
+        # Playlist tab UI
+        self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist)
 
         # Draw window using pack method
-        self.ntb_base.pack(fill='both', expand=True)
-        self.lst_songs.pack(fill=BOTH, expand=True)
-        self.progress_bar.pack(fill=BOTH)
-        self.ent_path.pack(side=TOP)
-        self.option_selected_file_menu.pack()
-        self.btn_read.pack()
-        self.ent_artist.pack()
-        self.ent_title.pack()
-        self.ent_genre.pack()
-        self.ent_year.pack()
-        self.btn_apply.pack()
-        self.opt_sort_by_menu.pack()
-        self.btn_sort.pack()
+        self.master.pack()
+        self.songs.pack()
+        self.playlist.pack()
 
-        # Set default values
-        self.ent_path.insert(0, 'Enter folder path..')
+        # Reset to default
+        self.songs.set_default()
         self.set_filter_entry_default()
 
     def sort_by_option_changed(self, *args):
-        self.sort_by = self.selected_sort_by_option.get().lower()
+        so = self.songs
+        so.sort_by = so.selected_sort_by_option.get().lower()
 
     def file_type_option_changed(self, *args):
-        self.file_types = self.file_types_dict[self.selected_file_option.get()]
+        so = self.songs
+        so.file_types = so.file_types_dict[so.selected_file_option.get()]
 
     def set_filter_entry_default(self):
-        if self.ent_year.get() == '':
-            self.ent_year.insert(0, 'Year')
-        if self.ent_title.get() == '':
-            self.ent_title.insert(0, 'Title')
-        if self.ent_artist.get() == '':
-            self.ent_artist.insert(0, 'Artist')
-        if self.ent_genre.get() == '':
-            self.ent_genre.insert(0, 'Genre')
+        so = self.songs
+        if so.ent_year.get() == '':
+            so.ent_year.insert(0, 'Year')
+        if so.ent_title.get() == '':
+            so.ent_title.insert(0, 'Title')
+        if so.ent_artist.get() == '':
+            so.ent_artist.insert(0, 'Artist')
+        if so.ent_genre.get() == '':
+            so.ent_genre.insert(0, 'Genre')
 
     def draw_songs_list(self):
-        self.lst_songs.delete(0, END)
+        so = self.songs
+        so.lst.delete(0, END)
         for song in self.audio_tracks_list:
             if self.filter_metadata == song:
-                self.lst_songs.insert(tk.END, f'{song.artist} - {song.title}')
+                so.insert_to_end_of_list(f'{song.artist} - {song.title}')
 
     def click_btn_sort(self):
-        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.sort_by)
+        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.songs.sort_by)
         self.draw_songs_list()
 
     def click_btn_read(self):
         folder_path = ''
+        so = self.songs
         try:
-            folder_path = self.ent_path.get()
-            audio_files = get_file_names_in_folder(folder_path, self.file_types)
+            folder_path = so.ent_path.get()
+            audio_files = get_file_names_in_folder(folder_path, so.file_types)
         except FileNotFoundError:
             # Invalid path, so we need to run file dialog.
-            folder_path = filedialog.askdirectory()
-            self.ent_path.delete(0, 'end')
-            self.ent_path.insert(0, folder_path)
-            audio_files = get_file_names_in_folder(folder_path, self.file_types)
+            folder_path = askdirectory()
+            so.ent_path.delete(0, 'end')
+            so.ent_path.insert(0, folder_path)
+            audio_files = get_file_names_in_folder(folder_path, so.file_types)
         self.set_filter_entry_default()
 
         def read_folder(app_self):
+            songs = app_self.songs
             count_of_files = len(audio_files)
             if count_of_files == 0:
-                app_self.lst_songs.insert(tk.END, 'No audio files found')
+                songs.insert_to_end_of_list('No audio files found')
 
             app_self.audio_tracks_list[:] = []
             file_index = 0
 
             for audio_file in audio_files:
                 percent = file_index * 100 / count_of_files
-                if app_self.progress_bar['value'] != percent:
-                    app_self.progress_bar['value'] = percent
+                if songs.progress_bar['value'] != percent:
+                    songs.progress_bar['value'] = percent
                 audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
                     AudioTrackFlac(f'{folder_path}\\{audio_file}')
                 app_self.audio_tracks_list.append(audio_metadata_item)
                 file_index += 1
 
-            app_self.progress_bar['value'] = 100
+            songs.progress_bar['value'] = 100
 
-            messagebox.showinfo("Success", f"{file_index} files found")
+            showinfo("Success", f"{file_index} files found")
 
-            app_self.progress_bar['value'] = 0
+            songs.progress_bar['value'] = 0
             self.draw_songs_list()
 
         thread = threading.Thread(target=read_folder, args=(self,))
@@ -195,14 +104,16 @@ class App:
         self.set_filter_entry_default()
         self.filter_metadata = AudioTrackFilter()
 
-        if self.ent_title.get() != 'Title':
-            self.filter_metadata.title = self.ent_title.get()
-        if self.ent_artist.get() != 'Artist':
-            self.filter_metadata.artist = self.ent_artist.get()
-        if self.ent_genre.get() != 'Genre':
-            self.filter_metadata.genre = self.ent_genre.get()
-        if self.ent_year.get() != 'Year':
-            year = int(self.ent_year.get())
+        so = self.songs
+
+        if so.ent_title.get() != 'Title':
+            self.filter_metadata.title = so.ent_title.get()
+        if so.ent_artist.get() != 'Artist':
+            self.filter_metadata.artist = so.ent_artist.get()
+        if so.ent_genre.get() != 'Genre':
+            self.filter_metadata.genre = so.ent_genre.get()
+        if so.ent_year.get() != 'Year':
+            year = int(so.ent_year.get())
             self.filter_metadata.year_ignore = False
             self.filter_metadata.year_min = year - 1
             self.filter_metadata.year_max = year + 1
@@ -210,7 +121,7 @@ class App:
 
 
 def main():
-    root = tk.Tk()
+    root = DefaultMainUi()
     root.geometry('720x600')
 
     app = App(root)
