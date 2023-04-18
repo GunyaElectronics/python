@@ -126,10 +126,8 @@ class App:
 
 def main():
     root = DefaultMainUi()
-    root.geometry('720x600')
 
     app = App(root)
-    root.title('Audio metadata analyzer')
     root.mainloop()
 
 

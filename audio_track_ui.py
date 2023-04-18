@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import messagebox, filedialog
 from tkinter.ttk import Progressbar
+import tkinter.font as tk_font
 from tkinter import ttk
 
 
@@ -20,9 +21,17 @@ class DefaultMainUi(Tk):
         self.ntb_base.add(self.frm_tab_playlist, text='Playlist')
         self.ntb_base.add(self.frm_tab_download, text='Download')
         self.ntb_base.add(self.frm_tab_edit, text='Edit')
+        self.geometry('720x600')
+        self.title('Audio metadata analyzer')
 
     def pack(self):
         self.ntb_base.pack(fill='both', expand=True)
+
+
+def dummy_label(frame, font_size):
+    font = tk_font.Font(size=font_size)
+    lbl_dummy = tk.Label(frame, text='', font=font)
+    lbl_dummy.pack()
 
 
 class DefaultUiFrame:
@@ -49,6 +58,12 @@ class DefaultUiFrame:
 
     def option_config_width(self, menu):
         menu.config(width=self.options_elements_width)
+
+    def indent_on_buttons_frame(self, size=12):
+        dummy_label(self.frm_buttons, size)
+
+    def indent_on_visual_frame(self, size=12):
+        dummy_label(self.frm_visual, size)
 
 
 class FrameWithListbox(DefaultUiFrame):
@@ -122,11 +137,13 @@ class SongsUiFrame(FrameWithListbox):
         self.ent_path.pack(side=TOP)
         self.option_selected_file_menu.pack()
         self.btn_read.pack()
+        self.indent_on_buttons_frame()
         self.ent_artist.pack()
         self.ent_title.pack()
         self.ent_genre.pack()
         self.ent_year.pack()
         self.btn_apply.pack()
+        self.indent_on_buttons_frame()
         self.opt_sort_by_menu.pack()
         self.btn_sort.pack()
 
