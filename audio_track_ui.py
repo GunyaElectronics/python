@@ -146,3 +146,16 @@ class PlaylistUiFrame(FrameWithListbox):
         super().pack()
         self.ent_path.pack(side=TOP)
         self.btn_remove.pack()
+
+
+class DownloadUiFrame(FrameWithListbox):
+    def __init__(self, frm_master):
+        super().__init__(frm_master)
+        self.ent_phrase = self.entry()
+        self.ent_phrase.insert(0, '')
+        self.btn_search = self.button(txt='Search', cmd=None)
+
+    def pack(self):
+        super().pack()
+        self.ent_phrase.pack(side=TOP)
+        self.btn_search.pack()

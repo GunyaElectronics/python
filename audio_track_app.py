@@ -19,10 +19,14 @@ class App:
         # Playlist tab UI
         self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist)
 
+        # Download tab UI
+        self.download = DownloadUiFrame(self.master.frm_tab_download)
+
         # Draw window using pack method
         self.master.pack()
         self.songs.pack()
         self.playlist.pack()
+        self.download.pack()
 
         # Reset to default
         self.songs.set_default()
