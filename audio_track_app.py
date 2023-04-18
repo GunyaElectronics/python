@@ -54,9 +54,9 @@ class App:
     def draw_songs_list(self):
         so = self.songs
         so.lst.delete(0, END)
-        for song in self.audio_tracks_list:
-            if self.filter_metadata == song:
-                so.insert_to_end_of_list(f'{song.artist} - {song.title}')
+        for list_item in self.audio_tracks_list:
+            if self.filter_metadata == list_item.track:
+                so.insert_to_end_of_list(f'{list_item.track.artist} - {list_item.track.title}')
 
     def click_btn_sort(self):
         self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.songs.sort_by)
@@ -91,7 +91,8 @@ class App:
                     songs.progress_bar['value'] = percent
                 audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
                     AudioTrackFlac(f'{folder_path}\\{audio_file}')
-                app_self.audio_tracks_list.append(audio_metadata_item)
+                play_list_item = PlaylistItem(audio_metadata_item)
+                app_self.audio_tracks_list.append(play_list_item)
                 file_index += 1
 
             songs.progress_bar['value'] = 100

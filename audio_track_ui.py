@@ -104,6 +104,7 @@ class SongsUiFrame(FrameWithListbox):
         self.btn_read = self.button(txt="Read folder content", cmd=click_btn_read)
         self.btn_apply = self.button(txt="Apply filter", cmd=click_btn_apply)
         self.btn_sort = self.button(txt="Sort songs", cmd=click_btn_sort)
+        self.btn_add_to_pl = self.button(txt='Add to playlist', cmd=None)
 
         self.ent_path = self.entry()
         self.ent_artist = self.entry()
@@ -146,6 +147,7 @@ class SongsUiFrame(FrameWithListbox):
         self.indent_on_buttons_frame()
         self.opt_sort_by_menu.pack()
         self.btn_sort.pack()
+        self.btn_add_to_pl.pack()
 
     def set_default(self):
         # Set default values
