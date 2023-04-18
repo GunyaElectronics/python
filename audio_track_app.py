@@ -31,6 +31,8 @@ class App:
         # Reset to default
         self.songs.set_default()
         self.set_filter_entry_default()
+        self.songs.lst.bind('<<ListboxSelect>>', self.song_lst_event_item_selected)
+        self.songs.lst.bind('<Double-Button-1>', self.song_lst_event_item_double_click)
 
     def sort_by_option_changed(self, *args):
         so = self.songs
@@ -123,6 +125,12 @@ class App:
             self.filter_metadata.year_min = year - 1
             self.filter_metadata.year_max = year + 1
         self.draw_songs_list()
+
+    def song_lst_event_item_selected(self, event):
+        print(self.songs.lst.get(self.songs.lst.curselection()))
+
+    def song_lst_event_item_double_click(self, event):
+        print(self.songs.lst.curselection())
 
 
 def main():
