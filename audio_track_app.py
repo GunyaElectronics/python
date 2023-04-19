@@ -1,167 +1,148 @@
 from dev_tools import get_file_names_in_folder
-import threading
+from audio_track_ui import *
 from audio_track import *
-from tkinter import *
-from tkinter import messagebox
-from tkinter.ttk import Progressbar
-import tkinter as tk
+import threading
 
 
 class App:
     def __init__(self, master_ui):
-
         # Algorithm elements
         self.filter_metadata = AudioTrackFilter()
         self.audio_tracks_list = []
 
         # UI elements
-        self.master = master_ui
-        self.progress_bar = Progressbar(self.master, orient=HORIZONTAL, length=200, mode='determinate')
-        self.progress_bar['value'] = 0
+        self.master = master_ui  # Main window
 
-        self.listbox = tk.Listbox(self.master, width=100, height=30)
+        # Songs tab UI
+        self.songs = SongsUiFrame(self.master.frm_tab_songs, self.click_btn_read, self.click_btn_apply,
+                                  self.click_btn_sort, self.file_type_option_changed, self.sort_by_option_changed)
+        # Playlist tab UI
+        self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist)
 
-        self.scrollbar = Scrollbar(self.listbox)
-        self.scrollbar.pack(side=RIGHT, fill=Y)
+        # Download tab UI
+        self.download = DownloadUiFrame(self.master.frm_tab_download)
 
-        self.listbox.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.config(command=self.listbox.yview)
-
-        elements_width = 33
-        self.button_read = tk.Button(self.master, text="Read folder content", command=self.click_button_read,
-                                     width=elements_width)
-        self.button_apply = tk.Button(self.master, text="Apply filter", command=self.click_button_apply,
-                                      width=elements_width)
-        self.button_sort = tk.Button(self.master, text="Sort songs", command=self.click_button_sort,
-                                     width=elements_width)
-        self.file_types_dict = {'Search all files': ['mp3', 'flac'],
-                                'Search mp3 only': ['mp3'],
-                                'Search flac only': ['flac']
-                                }
-        self.file_types = self.file_types_dict['Search all files']
-        self.file_type_options = list(self.file_types_dict.keys())
-        self.selected_file_option = tk.StringVar(value=self.file_type_options[0])
-
-        self.selected_file_option.trace('w', self.file_type_option_changed)
-        self.option_selected_file_menu = tk.OptionMenu(self.master, self.selected_file_option, *self.file_type_options)
-        self.option_selected_file_menu.config(width=elements_width)
-
-        self.sort_by_options = ['Artist', 'Title', 'Genre', 'Album']
-        self.sort_by = self.sort_by_options[0].lower()
-        self.selected_sort_by_option = tk.StringVar(value=self.sort_by_options[0])
-        self.selected_sort_by_option.trace('w', self.sort_by_option_changed)
-        self.option_sort_by_menu = tk.OptionMenu(self.master, self.selected_sort_by_option, *self.sort_by_options)
-        self.option_sort_by_menu.config(width=elements_width)
-
-        entry_width = 40
-        self.entry_path = tk.Entry(self.master, width=entry_width)
-        self.entry_artist = tk.Entry(self.master, width=entry_width)
-        self.entry_title = tk.Entry(self.master, width=entry_width)
-        self.entry_genre = tk.Entry(self.master, width=entry_width)
-        self.entry_year = tk.Entry(self.master, width=entry_width)
+        # Bind another business logic callbacks
+        self.songs.bind_double_click_lst_item_callback(self.song_lst_event_item_double_click)
+        self.songs.bind_select_lst_item_callback(self.song_lst_event_item_selected)
 
         # Draw window using pack method
-        self.listbox.pack(fill=BOTH, expand=True)
-        self.progress_bar.pack(fill=BOTH)
-        self.entry_path.pack(side=TOP)
-        self.option_selected_file_menu.pack()
-        self.button_read.pack()
-        self.entry_artist.pack()
-        self.entry_title.pack()
-        self.entry_genre.pack()
-        self.entry_year.pack()
-        self.button_apply.pack()
-        self.option_sort_by_menu.pack()
-        self.button_sort.pack()
+        self.master.pack()
+        self.songs.pack()
+        self.playlist.pack()
+        self.download.pack()
 
-        # Set default values
-        self.entry_path.insert(0, 'Enter folder path..')
+        # Reset to default
+        self.songs.set_default()
         self.set_filter_entry_default()
 
     def sort_by_option_changed(self, *args):
-        self.sort_by = self.selected_sort_by_option.get().lower()
+        so = self.songs
+        so.sort_by = so.selected_sort_by_option.get().lower()
 
     def file_type_option_changed(self, *args):
-        self.file_types = self.file_types_dict[self.selected_file_option.get()]
+        so = self.songs
+        so.file_types = so.file_types_dict[so.selected_file_option.get()]
 
     def set_filter_entry_default(self):
-        if self.entry_year.get() == '':
-            self.entry_year.insert(0, 'Year')
-        if self.entry_title.get() == '':
-            self.entry_title.insert(0, 'Title')
-        if self.entry_artist.get() == '':
-            self.entry_artist.insert(0, 'Artist')
-        if self.entry_genre.get() == '':
-            self.entry_genre.insert(0, 'Genre')
+        so = self.songs
+        if so.ent_year.get() == '':
+            so.ent_year.insert(0, 'Year')
+        if so.ent_title.get() == '':
+            so.ent_title.insert(0, 'Title')
+        if so.ent_artist.get() == '':
+            so.ent_artist.insert(0, 'Artist')
+        if so.ent_genre.get() == '':
+            so.ent_genre.insert(0, 'Genre')
 
     def draw_songs_list(self):
-        self.listbox.delete(0, END)
-        for song in self.audio_tracks_list:
-            if self.filter_metadata == song:
-                self.listbox.insert(tk.END, f'{song.artist} - {song.title}')
+        so = self.songs
+        so.lst.delete(0, END)
+        for list_item in self.audio_tracks_list:
+            if self.filter_metadata == list_item.track:
+                so.insert_to_end_of_list(f'{list_item.track.artist} - {list_item.track.title}')
 
-    def click_button_sort(self):
-        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.sort_by)
+    def click_btn_sort(self):
+        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.songs.sort_by)
         self.draw_songs_list()
 
-    def click_button_read(self):
+    def click_btn_read(self):
+        folder_path = ''
+        so = self.songs
+        try:
+            folder_path = so.ent_path.get()
+            audio_files = get_file_names_in_folder(folder_path, so.file_types)
+        except FileNotFoundError:
+            # Invalid path, so we need to run file dialog.
+            folder_path = askdirectory()
+            so.ent_path.delete(0, 'end')
+            so.ent_path.insert(0, folder_path)
+            audio_files = get_file_names_in_folder(folder_path, so.file_types)
         self.set_filter_entry_default()
 
         def read_folder(app_self):
-            folder_path = app_self.entry_path.get()
-            # Search all audio files in folder
-            audio_files = get_file_names_in_folder(folder_path, self.file_types)
-
+            songs = app_self.songs
             count_of_files = len(audio_files)
             if count_of_files == 0:
-                app_self.listbox.insert(tk.END, 'No audio files found')
+                songs.insert_to_end_of_list('No audio files found')
 
             app_self.audio_tracks_list[:] = []
             file_index = 0
 
             for audio_file in audio_files:
                 percent = file_index * 100 / count_of_files
-                if app_self.progress_bar['value'] != percent:
-                    app_self.progress_bar['value'] = percent
+                if songs.progress_bar['value'] != percent:
+                    songs.progress_bar['value'] = percent
                 audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
                     AudioTrackFlac(f'{folder_path}\\{audio_file}')
-                app_self.audio_tracks_list.append(audio_metadata_item)
+                play_list_item = PlaylistItem(audio_metadata_item)
+                app_self.audio_tracks_list.append(play_list_item)
                 file_index += 1
 
-            app_self.progress_bar['value'] = 100
+            songs.progress_bar['value'] = 100
 
-            messagebox.showinfo("Success", f"{file_index} files found")
+            showinfo("Success", f"{file_index} files found")
 
-            app_self.progress_bar['value'] = 0
+            songs.progress_bar['value'] = 0
             self.draw_songs_list()
 
         thread = threading.Thread(target=read_folder, args=(self,))
         thread.start()
 
-    def click_button_apply(self):
+    def click_btn_apply(self):
         self.set_filter_entry_default()
         self.filter_metadata = AudioTrackFilter()
 
-        if self.entry_title.get() != 'Title':
-            self.filter_metadata.title = self.entry_title.get()
-        if self.entry_artist.get() != 'Artist':
-            self.filter_metadata.artist = self.entry_artist.get()
-        if self.entry_genre.get() != 'Genre':
-            self.filter_metadata.genre = self.entry_genre.get()
-        if self.entry_year.get() != 'Year':
-            year = int(self.entry_year.get())
+        so = self.songs
+
+        if so.ent_title.get() != 'Title':
+            self.filter_metadata.title = so.ent_title.get()
+        if so.ent_artist.get() != 'Artist':
+            self.filter_metadata.artist = so.ent_artist.get()
+        if so.ent_genre.get() != 'Genre':
+            self.filter_metadata.genre = so.ent_genre.get()
+        if so.ent_year.get() != 'Year':
+            year = int(so.ent_year.get())
             self.filter_metadata.year_ignore = False
             self.filter_metadata.year_min = year - 1
             self.filter_metadata.year_max = year + 1
         self.draw_songs_list()
 
+    def song_lst_event_item_selected(self, event):
+        if len(self.songs.lst.curselection()) > 0:
+            s = self.audio_tracks_list[self.songs.lst.curselection()[0]]
+            self.songs.draw_track_metadata(s.track)
+        else:
+            self.songs.draw_track_metadata()
+
+    def song_lst_event_item_double_click(self, event):
+        pass
+
 
 def main():
-    root = tk.Tk()
-    root.geometry('720x600')
+    root = DefaultMainUi()
 
     app = App(root)
-    root.title('Audio metadata analyzer')
     root.mainloop()
 
 
