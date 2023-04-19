@@ -21,8 +21,8 @@ class DefaultMainUi(Tk):
         self.ntb_base.add(self.frm_tab_playlist, text='Playlist')
         self.ntb_base.add(self.frm_tab_download, text='Download')
         self.ntb_base.add(self.frm_tab_edit, text='Edit')
-        self.geometry('720x600')
-        self.title('Audio metadata analyzer')
+        self.geometry('720x670')
+        self.title('Audio Metadata Analyzer V0.2')
 
     def pack(self):
         self.ntb_base.pack(fill='both', expand=True)
@@ -65,6 +65,10 @@ class DefaultUiFrame:
     def indent_on_visual_frame(self, size=12):
         dummy_label(self.frm_visual, size)
 
+    def label(self, txt='', size=10):
+        font = tk_font.Font(size=size)
+        return tk.Label(self.frm_buttons, text=txt, font=font, width=self.buttons_elements_width, anchor="w")
+
 
 class FrameWithListbox(DefaultUiFrame):
     def __init__(self, frm_master):
@@ -77,12 +81,24 @@ class FrameWithListbox(DefaultUiFrame):
         self.lst.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.lst.yview)
 
+        self.lbl_title = self.label()
+        self.lbl_artist = self.label()
+        self.lbl_album = self.label()
+        self.lbl_year = self.label()
+        self.lbl_genre = self.label()
+
     def pack(self):
         super().pack()
         self.lst.pack(fill=BOTH, expand=True)
 
     def insert_to_end_of_list(self, text):
         self.lst.insert(tk.END, text)
+
+    def bind_select_lst_item_callback(self, callback):
+        self.lst.bind('<<ListboxSelect>>', callback)
+
+    def bind_double_click_lst_item_callback(self, callback):
+        self.lst.bind('<Double-Button-1>', callback)
 
 
 def askdirectory():
@@ -148,10 +164,31 @@ class SongsUiFrame(FrameWithListbox):
         self.opt_sort_by_menu.pack()
         self.btn_sort.pack()
         self.btn_add_to_pl.pack()
+        self.indent_on_buttons_frame()
+        self.lbl_title.pack()
+        self.lbl_artist.pack()
+        self.lbl_album.pack()
+        self.lbl_year.pack()
+        self.lbl_genre.pack()
 
     def set_default(self):
         # Set default values
         self.ent_path.insert(0, 'Enter folder path..')
+
+    def draw_track_metadata(self, track=None):
+        t = track
+        if t is None:
+            self.lbl_title.configure(text='')
+            self.lbl_artist.configure(text='')
+            self.lbl_album.configure(text='')
+            self.lbl_year.configure(text='')
+            self.lbl_genre.configure(text='')
+            return
+        self.lbl_title.configure(text=f'Title:\t{t.title}')
+        self.lbl_artist.configure(text=f'Artist:\t{t.artist}')
+        self.lbl_album.configure(text=f'Album:\t{t.album}')
+        self.lbl_year.configure(text=f'Year:\t{t.year}')
+        self.lbl_genre.configure(text=f'Genre:\t{t.genre}')
 
 
 class PlaylistUiFrame(FrameWithListbox):
@@ -165,6 +202,12 @@ class PlaylistUiFrame(FrameWithListbox):
         super().pack()
         self.ent_path.pack(side=TOP)
         self.btn_remove.pack()
+        self.indent_on_buttons_frame()
+        self.lbl_title.pack()
+        self.lbl_artist.pack()
+        self.lbl_album.pack()
+        self.lbl_year.pack()
+        self.lbl_genre.pack()
 
 
 class DownloadUiFrame(FrameWithListbox):

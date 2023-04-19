@@ -6,6 +6,7 @@ import operator
 class PlaylistItem:
     def __init__(self, track, is_added=False):
         self.track = track
+        self.list_index = None
         self.is_added = is_added
 
     def __repr__(self):

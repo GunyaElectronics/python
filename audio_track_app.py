@@ -22,6 +22,10 @@ class App:
         # Download tab UI
         self.download = DownloadUiFrame(self.master.frm_tab_download)
 
+        # Bind another business logic callbacks
+        self.songs.bind_double_click_lst_item_callback(self.song_lst_event_item_double_click)
+        self.songs.bind_select_lst_item_callback(self.song_lst_event_item_selected)
+
         # Draw window using pack method
         self.master.pack()
         self.songs.pack()
@@ -31,8 +35,6 @@ class App:
         # Reset to default
         self.songs.set_default()
         self.set_filter_entry_default()
-        self.songs.lst.bind('<<ListboxSelect>>', self.song_lst_event_item_selected)
-        self.songs.lst.bind('<Double-Button-1>', self.song_lst_event_item_double_click)
 
     def sort_by_option_changed(self, *args):
         so = self.songs
@@ -127,10 +129,14 @@ class App:
         self.draw_songs_list()
 
     def song_lst_event_item_selected(self, event):
-        print(self.songs.lst.get(self.songs.lst.curselection()))
+        if len(self.songs.lst.curselection()) > 0:
+            s = self.audio_tracks_list[self.songs.lst.curselection()[0]]
+            self.songs.draw_track_metadata(s.track)
+        else:
+            self.songs.draw_track_metadata()
 
     def song_lst_event_item_double_click(self, event):
-        print(self.songs.lst.curselection())
+        pass
 
 
 def main():
