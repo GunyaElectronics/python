@@ -202,7 +202,7 @@ class SongsUiFrame(FrameWithListbox):
             self.lbl_album_art.config(image=tk_image)
         else:
             self.lbl_album_art.image = None
-            self.lbl_album_art.config(image=None)
+            self.lbl_album_art.config(image='')
             self.lbl_album_art.update()
 
 

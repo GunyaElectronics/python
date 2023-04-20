@@ -1,5 +1,4 @@
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, ID3NoHeaderError
 from mutagen.flac import FLAC
 import operator
 
@@ -83,7 +82,7 @@ class AudioTrackFilter:
                 (not self.genre or self.genre == other.genre) and \
                 (not self.year_min or self.year_min == other.year_min) and \
                 (not self.year_max or self.year_max == other.year_max)
-        else: # isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
+        else:  # isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
             return self._check_title(other) and self._check_artist(other) and self._check_genre(other) and \
                 (self.year_ignore or self.year_max > other.get_year_safe() > self.year_min)
 
@@ -115,18 +114,15 @@ class AudioTrackMp3(AudioTrack):
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
         self.cover_art = self._read_cover_art()
-
         self.is_have_cover_art = False if self.cover_art is None else True
 
     def _read_cover_art(self):
         try:
-            data = self.audio["APIC:"].data
+            data = self.audio['APIC:'].data
         except KeyError:
             for key in self.audio.keys():
                 if 'APIC' in key:
-                    print('ok')
                     return self.audio[key].data
-            print(f'Exception {self.file_path}')
             data = None
         return data
 

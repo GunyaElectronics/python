@@ -36,11 +36,11 @@ class App:
         self.songs.set_default()
         self.set_filter_entry_default()
 
-    def sort_by_option_changed(self, *args):
+    def sort_by_option_changed(self):
         so = self.songs
         so.sort_by = so.selected_sort_by_option.get().lower()
 
-    def file_type_option_changed(self, *args):
+    def file_type_option_changed(self):
         so = self.songs
         so.file_types = so.file_types_dict[so.selected_file_option.get()]
 
