@@ -114,13 +114,21 @@ class AudioTrackMp3(AudioTrack):
         self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
-        try:
-            tags = ID3(file_path)
-            img = tags.get("APIC:")
-        except ID3NoHeaderError:
-            img = None
-        self.cover_art = img.data if img is not None else None
+        self.cover_art = self._read_cover_art()
+
         self.is_have_cover_art = False if self.cover_art is None else True
+
+    def _read_cover_art(self):
+        try:
+            data = self.audio["APIC:"].data
+        except KeyError:
+            for key in self.audio.keys():
+                if 'APIC' in key:
+                    print('ok')
+                    return self.audio[key].data
+            print(f'Exception {self.file_path}')
+            data = None
+        return data
 
 
 def sort_audio_tracks_list(songs_list, sort_by):
