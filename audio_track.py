@@ -23,6 +23,8 @@ class AudioTrack:
         self.genre = None
         self.year = None
         self.track_number = None
+        self.is_have_cover_art = False
+        self.cover_art = None
 
     def get_year_safe(self):
         try:
@@ -30,6 +32,9 @@ class AudioTrack:
             return y
         except ValueError:
             return -1
+
+    def is_have_cover_img(self):
+        return self.is_have_cover_art
 
     def __repr__(self):
         return f"AudioTrack({self.title}, {self.artist}, {self.album}, {self.album_artist}, {self.genre})"
@@ -77,7 +82,7 @@ class AudioTrackFilter:
                 (not self.genre or self.genre == other.genre) and \
                 (not self.year_min or self.year_min == other.year_min) and \
                 (not self.year_max or self.year_max == other.year_max)
-        else: # isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
+        else:  # isinstance(other, AudioTrack) or isinstance(other, AudioTrackMp3) or isinstance(other, AudioTrackFlac):
             return self._check_title(other) and self._check_artist(other) and self._check_genre(other) and \
                 (self.year_ignore or self.year_max > other.get_year_safe() > self.year_min)
 
@@ -108,6 +113,18 @@ class AudioTrackMp3(AudioTrack):
         self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
+        self.cover_art = self._read_cover_art()
+        self.is_have_cover_art = False if self.cover_art is None else True
+
+    def _read_cover_art(self):
+        try:
+            data = self.audio['APIC:'].data
+        except KeyError:
+            for key in self.audio.keys():
+                if 'APIC' in key:
+                    return self.audio[key].data
+            data = None
+        return data
 
 
 def sort_audio_tracks_list(songs_list, sort_by):
