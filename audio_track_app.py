@@ -4,6 +4,13 @@ from audio_track import *
 import threading
 
 
+def get_list_item_text(list_item):
+    t = list_item.track
+    if t.title == '' and t.artist == '':
+        return f'{t.file_path}'
+    return f'{t.artist} - {t.title}'
+
+
 class App:
     def __init__(self, master_ui):
         # Algorithm elements
@@ -57,13 +64,13 @@ class App:
 
     def draw_songs_list(self):
         so = self.songs
-        so.lst.delete(0, END)
+        so.lst_delete_all()
         for list_item in self.audio_tracks_list:
             if self.filter_metadata == list_item.track:
-                so.insert_to_end_of_list(f'{list_item.track.artist} - {list_item.track.title}')
+                so.insert_to_end_of_list(get_list_item_text(list_item), list_item.list_index)
 
     def click_btn_sort(self):
-        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, self.songs.sort_by)
+        self.audio_tracks_list = sort_audio_tracks_list(self.audio_tracks_list, f'track.{self.songs.sort_by}')
         self.draw_songs_list()
 
     def click_btn_read(self):
@@ -96,6 +103,7 @@ class App:
                 audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
                     AudioTrackFlac(f'{folder_path}\\{audio_file}')
                 play_list_item = PlaylistItem(audio_metadata_item)
+                play_list_item.list_index = file_index
                 app_self.audio_tracks_list.append(play_list_item)
                 file_index += 1
 
@@ -129,11 +137,9 @@ class App:
         self.draw_songs_list()
 
     def song_lst_event_item_selected(self, event):
-        if len(self.songs.lst.curselection()) > 0:
-            s = self.audio_tracks_list[self.songs.lst.curselection()[0]]
-            self.songs.draw_track_metadata(s.track)
-        else:
-            self.songs.draw_track_metadata()
+        index = self.songs.get_selected_user_index()
+        s = None if index is None else self.audio_tracks_list[index]
+        self.songs.draw_track_metadata(s if not s else s.track)
 
     def song_lst_event_item_double_click(self, event):
         pass

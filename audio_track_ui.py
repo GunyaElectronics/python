@@ -76,6 +76,7 @@ class FrameWithListbox(DefaultUiFrame):
     def __init__(self, frm_master):
         super().__init__(frm_master)
         self.lst = tk.Listbox(self.frm_visual, width=100, height=30)
+        self._lst_user_indexes = []
 
         self.scrollbar = Scrollbar(self.lst)
         self.scrollbar.pack(side=RIGHT, fill=Y)
@@ -95,14 +96,24 @@ class FrameWithListbox(DefaultUiFrame):
         super().pack()
         self.lst.pack(fill=BOTH, expand=True)
 
-    def insert_to_end_of_list(self, text):
+    def insert_to_end_of_list(self, text, index):
         self.lst.insert(tk.END, text)
+        self._lst_user_indexes.append(index)
+
+    def get_selected_user_index(self):
+        if len(self.lst.curselection()) > 0:
+            return self._lst_user_indexes[self.lst.curselection()[0]]
+        return None
 
     def bind_select_lst_item_callback(self, callback):
         self.lst.bind('<<ListboxSelect>>', callback)
 
     def bind_double_click_lst_item_callback(self, callback):
         self.lst.bind('<Double-Button-1>', callback)
+
+    def lst_delete_all(self):
+        self.lst.delete(0, END)
+        self._lst_user_indexes[:] = []
 
 
 def askdirectory():
@@ -188,6 +199,9 @@ class SongsUiFrame(FrameWithListbox):
             self.lbl_album.configure(text='')
             self.lbl_year.configure(text='')
             self.lbl_genre.configure(text='')
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image='')
+            self.lbl_album_art.update()
             return
         self.lbl_title.configure(text=f'   Title:\t{t.title}')
         self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
