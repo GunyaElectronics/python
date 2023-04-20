@@ -1,4 +1,5 @@
 from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, ID3NoHeaderError
 from mutagen.flac import FLAC
 import operator
 
@@ -23,6 +24,8 @@ class AudioTrack:
         self.genre = None
         self.year = None
         self.track_number = None
+        self.is_have_cover_art = False
+        self.cover_art = None
 
     def get_year_safe(self):
         try:
@@ -30,6 +33,9 @@ class AudioTrack:
             return y
         except ValueError:
             return -1
+
+    def is_have_cover_img(self):
+        return self.is_have_cover_art
 
     def __repr__(self):
         return f"AudioTrack({self.title}, {self.artist}, {self.album}, {self.album_artist}, {self.genre})"
@@ -108,6 +114,13 @@ class AudioTrackMp3(AudioTrack):
         self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
+        try:
+            tags = ID3(file_path)
+            img = tags.get("APIC:")
+        except ID3NoHeaderError:
+            img = None
+        self.cover_art = img.data if img is not None else None
+        self.is_have_cover_art = False if self.cover_art is None else True
 
 
 def sort_audio_tracks_list(songs_list, sort_by):

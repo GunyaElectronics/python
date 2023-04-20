@@ -4,6 +4,8 @@ from tkinter import messagebox, filedialog
 from tkinter.ttk import Progressbar
 import tkinter.font as tk_font
 from tkinter import ttk
+from PIL import Image, ImageTk
+from io import BytesIO
 
 
 class DefaultMainUi(Tk):
@@ -21,7 +23,7 @@ class DefaultMainUi(Tk):
         self.ntb_base.add(self.frm_tab_playlist, text='Playlist')
         self.ntb_base.add(self.frm_tab_download, text='Download')
         self.ntb_base.add(self.frm_tab_edit, text='Edit')
-        self.geometry('720x670')
+        self.geometry('720x720')
         self.title('Audio Metadata Analyzer V0.2')
 
     def pack(self):
@@ -86,6 +88,8 @@ class FrameWithListbox(DefaultUiFrame):
         self.lbl_album = self.label()
         self.lbl_year = self.label()
         self.lbl_genre = self.label()
+
+        self.lbl_album_art = tk.Label(self.frm_buttons)
 
     def pack(self):
         super().pack()
@@ -170,6 +174,7 @@ class SongsUiFrame(FrameWithListbox):
         self.lbl_album.pack()
         self.lbl_year.pack()
         self.lbl_genre.pack()
+        self.lbl_album_art.pack()
 
     def set_default(self):
         # Set default values
@@ -184,11 +189,21 @@ class SongsUiFrame(FrameWithListbox):
             self.lbl_year.configure(text='')
             self.lbl_genre.configure(text='')
             return
-        self.lbl_title.configure(text=f'Title:\t{t.title}')
-        self.lbl_artist.configure(text=f'Artist:\t{t.artist}')
-        self.lbl_album.configure(text=f'Album:\t{t.album}')
-        self.lbl_year.configure(text=f'Year:\t{t.year}')
-        self.lbl_genre.configure(text=f'Genre:\t{t.genre}')
+        self.lbl_title.configure(text=f'   Title:\t{t.title}')
+        self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
+        self.lbl_album.configure(text=f'   Album:\t{t.album}')
+        self.lbl_year.configure(text=f'   Year:\t{t.year}')
+        self.lbl_genre.configure(text=f'   Genre:\t{t.genre}')
+        if t.is_have_cover_art:
+            pil_image = Image.open(BytesIO(t.cover_art))
+            new_image = pil_image.resize((240, 240))
+            tk_image = ImageTk.PhotoImage(new_image)
+            self.lbl_album_art.image = tk_image
+            self.lbl_album_art.config(image=tk_image)
+        else:
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image=None)
+            self.lbl_album_art.update()
 
 
 class PlaylistUiFrame(FrameWithListbox):
@@ -208,6 +223,7 @@ class PlaylistUiFrame(FrameWithListbox):
         self.lbl_album.pack()
         self.lbl_year.pack()
         self.lbl_genre.pack()
+        self.lbl_album_art.pack()
 
 
 class DownloadUiFrame(FrameWithListbox):
