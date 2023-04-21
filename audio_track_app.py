@@ -136,13 +136,17 @@ class App:
             self.filter_metadata.year_max = year + 1
         self.draw_songs_list()
 
-    def song_lst_event_item_selected(self, event):
+    def _get_selected_playlist_item(self):
         index = self.songs.get_selected_user_index()
-        s = None if index is None else self.audio_tracks_list[index]
+        return None if index is None else self.audio_tracks_list[index]
+
+    def song_lst_event_item_selected(self, event):
+        s = self._get_selected_playlist_item()
         self.songs.draw_track_metadata(s if not s else s.track)
 
     def song_lst_event_item_double_click(self, event):
-        pass
+        s = self._get_selected_playlist_item()
+        s.track.is_added = True
 
 
 def main():
