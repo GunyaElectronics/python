@@ -127,6 +127,34 @@ class FrameWithListbox(DefaultUiFrame):
         self.lst.delete(0, END)
         self._lst_user_indexes[:] = []
 
+    def draw_track_metadata(self, track=None):
+        t = track
+        if t is None:
+            self.lbl_title.configure(text='')
+            self.lbl_artist.configure(text='')
+            self.lbl_album.configure(text='')
+            self.lbl_year.configure(text='')
+            self.lbl_genre.configure(text='')
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image='')
+            self.lbl_album_art.update()
+            return
+        self.lbl_title.configure(text=f'   Title:\t{t.title}')
+        self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
+        self.lbl_album.configure(text=f'   Album:\t{t.album}')
+        self.lbl_year.configure(text=f'   Year:\t{t.year}')
+        self.lbl_genre.configure(text=f'   Genre:\t{t.genre}')
+        if t.is_have_cover_art:
+            pil_image = Image.open(BytesIO(t.cover_art))
+            new_image = pil_image.resize((240, 240))
+            tk_image = ImageTk.PhotoImage(new_image)
+            self.lbl_album_art.image = tk_image
+            self.lbl_album_art.config(image=tk_image)
+        else:
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image='')
+            self.lbl_album_art.update()
+
 
 def askdirectory():
     return filedialog.askdirectory()
@@ -202,34 +230,6 @@ class SongsUiFrame(FrameWithListbox):
     def set_default(self):
         # Set default values
         self.ent_path.insert(0, 'Enter folder path..')
-
-    def draw_track_metadata(self, track=None):
-        t = track
-        if t is None:
-            self.lbl_title.configure(text='')
-            self.lbl_artist.configure(text='')
-            self.lbl_album.configure(text='')
-            self.lbl_year.configure(text='')
-            self.lbl_genre.configure(text='')
-            self.lbl_album_art.image = None
-            self.lbl_album_art.config(image='')
-            self.lbl_album_art.update()
-            return
-        self.lbl_title.configure(text=f'   Title:\t{t.title}')
-        self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
-        self.lbl_album.configure(text=f'   Album:\t{t.album}')
-        self.lbl_year.configure(text=f'   Year:\t{t.year}')
-        self.lbl_genre.configure(text=f'   Genre:\t{t.genre}')
-        if t.is_have_cover_art:
-            pil_image = Image.open(BytesIO(t.cover_art))
-            new_image = pil_image.resize((240, 240))
-            tk_image = ImageTk.PhotoImage(new_image)
-            self.lbl_album_art.image = tk_image
-            self.lbl_album_art.config(image=tk_image)
-        else:
-            self.lbl_album_art.image = None
-            self.lbl_album_art.config(image='')
-            self.lbl_album_art.update()
 
 
 class PlaylistUiFrame(FrameWithListbox):

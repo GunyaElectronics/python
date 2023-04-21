@@ -32,7 +32,7 @@ class App:
         # Bind another business logic callbacks
         self.songs.bind_double_click_lst_item_callback(self.song_lst_event_item_double_click)
         self.songs.bind_select_lst_item_callback(self.song_lst_event_item_selected)
-
+        self.playlist.bind_select_lst_item_callback(self.playlist_lst_event_item_selected)
         # Draw window using pack method
         self.master.pack()
         self.songs.pack()
@@ -136,16 +136,22 @@ class App:
             self.filter_metadata.year_max = year + 1
         self.draw_songs_list()
 
-    def _get_selected_playlist_item(self):
-        index = self.songs.get_selected_user_index()
+    def _get_selected_playlist_item(self, s):
+        index = s.get_selected_user_index()
         return None if index is None else self.audio_tracks_list[index]
 
     def song_lst_event_item_selected(self, event):
-        s = self._get_selected_playlist_item()
+        s = self._get_selected_playlist_item(self.songs)
         self.songs.draw_track_metadata(s if not s else s.track)
 
+    def playlist_lst_event_item_selected(self, event):
+        s = self._get_selected_playlist_item(self.playlist)
+        self.playlist.draw_track_metadata(s if not s else s.track)
+
     def song_lst_event_item_double_click(self, event):
-        lst_item = self._get_selected_playlist_item()
+        lst_item = self._get_selected_playlist_item(self.songs)
+        if lst_item is None:
+            return
         lst_item.track.is_added = True
         self.songs.remove_selected_lst_item()
         self.playlist.insert_to_end_of_list(get_list_item_text(lst_item), lst_item.list_index)
