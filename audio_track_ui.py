@@ -100,6 +100,18 @@ class FrameWithListbox(DefaultUiFrame):
         self.lst.insert(tk.END, text)
         self._lst_user_indexes.append(index)
 
+    def get_selected_lst_index(self):
+        if len(self.lst.curselection()) > 0:
+            return self.lst.curselection()[0]
+        return None
+
+    def remove_selected_lst_item(self):
+        if len(self.lst.curselection()) == 0:
+            return
+        index = self.lst.curselection()[0]
+        self._lst_user_indexes.pop(index)
+        self.lst.delete(index, index)
+
     def get_selected_user_index(self):
         if len(self.lst.curselection()) > 0:
             return self._lst_user_indexes[self.lst.curselection()[0]]

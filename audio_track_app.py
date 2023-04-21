@@ -145,8 +145,10 @@ class App:
         self.songs.draw_track_metadata(s if not s else s.track)
 
     def song_lst_event_item_double_click(self, event):
-        s = self._get_selected_playlist_item()
-        s.track.is_added = True
+        lst_item = self._get_selected_playlist_item()
+        lst_item.track.is_added = True
+        self.songs.remove_selected_lst_item()
+        self.playlist.insert_to_end_of_list(get_list_item_text(lst_item), lst_item.list_index)
 
 
 def main():
