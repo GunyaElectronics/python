@@ -154,6 +154,7 @@ class App:
             return
         lst_item.track.is_added = True
         self.songs.remove_selected_lst_item()
+        self.songs.draw_track_metadata()
         self.playlist.insert_to_end_of_list(get_list_item_text(lst_item), lst_item.list_index)
 
 
