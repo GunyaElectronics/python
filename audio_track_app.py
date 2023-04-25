@@ -22,7 +22,8 @@ class App:
 
         # Songs tab UI
         self.songs = SongsUiFrame(self.master.frm_tab_songs, self.click_btn_read, self.click_btn_apply,
-                                  self.click_btn_sort, self.file_type_option_changed, self.sort_by_option_changed)
+                                  self.click_btn_sort, self.file_type_option_changed, self.sort_by_option_changed,
+                                  self.click_btn_add_item)
         # Playlist tab UI
         self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist)
 
@@ -156,6 +157,15 @@ class App:
         self.songs.remove_selected_lst_item()
         self.songs.draw_track_metadata()
         self.playlist.insert_to_end_of_list(get_list_item_text(lst_item), lst_item.list_index)
+
+    def click_btn_add_item(self):
+        indexes = self.songs.get_all_selected_user_indexes()
+        self.songs.remove_selected_lst_items()
+        self.songs.lst.selection_clear(0)
+        for itm in indexes:
+            itm = self.audio_tracks_list[itm]
+            itm.track.is_added = True
+            self.playlist.insert_to_end_of_list(get_list_item_text(itm), itm.list_index)
 
 
 def main():

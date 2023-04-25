@@ -75,7 +75,7 @@ class DefaultUiFrame:
 class FrameWithListbox(DefaultUiFrame):
     def __init__(self, frm_master):
         super().__init__(frm_master)
-        self.lst = tk.Listbox(self.frm_visual, width=100, height=30)
+        self.lst = tk.Listbox(self.frm_visual, width=100, height=30, selectmode=EXTENDED)
         self._lst_user_indexes = []
 
         self.scrollbar = Scrollbar(self.lst)
@@ -112,10 +112,21 @@ class FrameWithListbox(DefaultUiFrame):
         self._lst_user_indexes.pop(index)
         self.lst.delete(index, index)
 
+    def remove_selected_lst_items(self):
+        for index in self.lst.curselection():
+            self._lst_user_indexes.pop(index)
+            self.lst.delete(index, index)
+
     def get_selected_user_index(self):
         if len(self.lst.curselection()) > 0:
             return self._lst_user_indexes[self.lst.curselection()[0]]
         return None
+
+    def get_all_selected_user_indexes(self):
+        lst = []
+        for sel in self.lst.curselection():
+            lst.append(self._lst_user_indexes[sel])
+        return lst
 
     def bind_select_lst_item_callback(self, callback):
         self.lst.bind('<<ListboxSelect>>', callback)
@@ -166,7 +177,7 @@ def showinfo(result, info):
 
 class SongsUiFrame(FrameWithListbox):
     def __init__(self, frm_master, click_btn_read, click_btn_apply, click_btn_sort, file_type_option_changed,
-                 sort_by_option_changed):
+                 sort_by_option_changed, click_btn_add):
         super().__init__(frm_master)
 
         self.progress_bar = self.progressbar()
@@ -175,7 +186,7 @@ class SongsUiFrame(FrameWithListbox):
         self.btn_read = self.button(txt="Read folder content", cmd=click_btn_read)
         self.btn_apply = self.button(txt="Apply filter", cmd=click_btn_apply)
         self.btn_sort = self.button(txt="Sort songs", cmd=click_btn_sort)
-        self.btn_add_to_pl = self.button(txt='Add to playlist', cmd=None)
+        self.btn_add_to_pl = self.button(txt='Add to playlist', cmd=click_btn_add)
 
         self.ent_path = self.entry()
         self.ent_artist = self.entry()
