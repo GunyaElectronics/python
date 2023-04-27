@@ -114,8 +114,8 @@ class FrameWithListbox(DefaultUiFrame):
 
     def remove_selected_lst_items(self):
         for index in self.lst.curselection():
-            self._lst_user_indexes.pop(index)
             self.lst.delete(index, index)
+            self._lst_user_indexes.pop(index)
 
     def get_selected_user_index(self):
         if len(self.lst.curselection()) > 0:
@@ -248,11 +248,16 @@ class PlaylistUiFrame(FrameWithListbox):
         super().__init__(frm_master)
         self.ent_path = self.entry()
         self.ent_path.insert(0, 'Folder path to save')
-        self.btn_remove = self.button(txt='Remove', cmd=None)
+        self.btn_browse = self.button(txt='Browse', cmd=None)
+        self.btn_save = self.button(txt='Save Playlist', cmd=None)
+        self.btn_remove = self.button(txt='Remove Item', cmd=None)
 
     def pack(self):
         super().pack()
         self.ent_path.pack(side=TOP)
+        self.btn_browse.pack()
+        self.btn_save.pack()
+        self.indent_on_buttons_frame()
         self.btn_remove.pack()
         self.indent_on_buttons_frame()
         self.lbl_title.pack()

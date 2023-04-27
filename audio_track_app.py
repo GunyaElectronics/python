@@ -160,8 +160,9 @@ class App:
 
     def click_btn_add_item(self):
         indexes = self.songs.get_all_selected_user_indexes()
+        if len(indexes):
+            self.songs.draw_track_metadata()
         self.songs.remove_selected_lst_items()
-        self.songs.lst.selection_clear(0)
         for itm in indexes:
             itm = self.audio_tracks_list[itm]
             itm.track.is_added = True
