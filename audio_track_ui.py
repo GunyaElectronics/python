@@ -75,7 +75,7 @@ class DefaultUiFrame:
 class FrameWithListbox(DefaultUiFrame):
     def __init__(self, frm_master):
         super().__init__(frm_master)
-        self.lst = tk.Listbox(self.frm_visual, width=100, height=30, selectmode=EXTENDED)
+        self.lst = tk.Listbox(self.frm_visual, width=100, height=30, selectmode=SINGLE)
         self._lst_user_indexes = []
 
         self.scrollbar = Scrollbar(self.lst)
