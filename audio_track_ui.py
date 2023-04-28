@@ -244,11 +244,11 @@ class SongsUiFrame(FrameWithListbox):
 
 
 class PlaylistUiFrame(FrameWithListbox):
-    def __init__(self, frm_master):
+    def __init__(self, frm_master, click_btn_browse):
         super().__init__(frm_master)
         self.ent_path = self.entry()
         self.ent_path.insert(0, 'Folder path to save')
-        self.btn_browse = self.button(txt='Browse', cmd=None)
+        self.btn_browse = self.button(txt='Browse', cmd=click_btn_browse)
         self.btn_save = self.button(txt='Save Playlist', cmd=None)
         self.btn_remove = self.button(txt='Remove Item', cmd=None)
 
@@ -266,6 +266,10 @@ class PlaylistUiFrame(FrameWithListbox):
         self.lbl_year.pack()
         self.lbl_genre.pack()
         self.lbl_album_art.pack()
+
+    def set_entry_text(self, txt):
+        self.ent_path.delete(0, 'end')
+        self.ent_path.insert(0, txt)
 
 
 class DownloadUiFrame(FrameWithListbox):

@@ -16,6 +16,7 @@ class App:
         # Algorithm elements
         self.filter_metadata = AudioTrackFilter()
         self.audio_tracks_list = []
+        self.playlist_path = None
 
         # UI elements
         self.master = master_ui  # Main window
@@ -25,7 +26,7 @@ class App:
                                   self.click_btn_sort, self.file_type_option_changed, self.sort_by_option_changed,
                                   self.click_btn_add_item)
         # Playlist tab UI
-        self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist)
+        self.playlist = PlaylistUiFrame(self.master.frm_tab_playlist, self.click_btn_browse)
 
         # Download tab UI
         self.download = DownloadUiFrame(self.master.frm_tab_download)
@@ -167,6 +168,10 @@ class App:
             itm = self.audio_tracks_list[itm]
             itm.track.is_added = True
             self.playlist.insert_to_end_of_list(get_list_item_text(itm), itm.list_index)
+
+    def click_btn_browse(self):
+        self.playlist_path = askdirectory()
+        self.playlist.set_entry_text(self.playlist_path)
 
 
 def main():
