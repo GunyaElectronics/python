@@ -244,12 +244,12 @@ class SongsUiFrame(FrameWithListbox):
 
 
 class PlaylistUiFrame(FrameWithListbox):
-    def __init__(self, frm_master, click_btn_browse):
+    def __init__(self, frm_master, click_btn_browse, click_btn_save):
         super().__init__(frm_master)
         self.ent_path = self.entry()
         self.ent_path.insert(0, 'Folder path to save')
         self.btn_browse = self.button(txt='Browse', cmd=click_btn_browse)
-        self.btn_save = self.button(txt='Save Playlist', cmd=None)
+        self.btn_save = self.button(txt='Save Playlist', cmd=click_btn_save)
         self.btn_remove = self.button(txt='Remove Item', cmd=None)
 
     def pack(self):
