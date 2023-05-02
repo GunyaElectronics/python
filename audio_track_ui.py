@@ -24,7 +24,7 @@ class DefaultMainUi(Tk):
         self.ntb_base.add(self.frm_tab_download, text='Download')
         self.ntb_base.add(self.frm_tab_edit, text='Edit')
         self.geometry('720x720')
-        self.title('Audio Metadata Analyzer V0.2')
+        self.title('Audio Metadata Analyzer V1.0')
 
     def pack(self):
         self.ntb_base.pack(fill='both', expand=True)
@@ -76,6 +76,7 @@ class FrameWithListbox(DefaultUiFrame):
     def __init__(self, frm_master):
         super().__init__(frm_master)
         self.lst = tk.Listbox(self.frm_visual, width=100, height=30)
+        self._lst_user_indexes = []
 
         self.scrollbar = Scrollbar(self.lst)
         self.scrollbar.pack(side=RIGHT, fill=Y)
@@ -95,14 +96,78 @@ class FrameWithListbox(DefaultUiFrame):
         super().pack()
         self.lst.pack(fill=BOTH, expand=True)
 
-    def insert_to_end_of_list(self, text):
+    def insert_to_end_of_list(self, text, index):
         self.lst.insert(tk.END, text)
+        self._lst_user_indexes.append(index)
+
+    def get_selected_lst_index(self):
+        if len(self.lst.curselection()) > 0:
+            return self.lst.curselection()[0]
+        return None
+
+    def remove_selected_lst_item(self):
+        if len(self.lst.curselection()) == 0:
+            return
+        index = self.lst.curselection()[0]
+        self._lst_user_indexes.pop(index)
+        self.lst.delete(index, index)
+
+    def remove_selected_lst_items(self):
+        for index in self.lst.curselection():
+            self.lst.delete(index, index)
+            self._lst_user_indexes.pop(index)
+
+    def get_selected_user_index(self):
+        if len(self.lst.curselection()) > 0:
+            return self._lst_user_indexes[self.lst.curselection()[0]]
+        return None
+
+    def get_all_selected_user_indexes(self):
+        lst = []
+        for sel in self.lst.curselection():
+            lst.append(self._lst_user_indexes[sel])
+        return lst
+
+    def get_all_user_indexes(self):
+        return self._lst_user_indexes
 
     def bind_select_lst_item_callback(self, callback):
         self.lst.bind('<<ListboxSelect>>', callback)
 
     def bind_double_click_lst_item_callback(self, callback):
         self.lst.bind('<Double-Button-1>', callback)
+
+    def lst_delete_all(self):
+        self.lst.delete(0, END)
+        self._lst_user_indexes[:] = []
+
+    def draw_track_metadata(self, track=None):
+        t = track
+        if t is None:
+            self.lbl_title.configure(text='')
+            self.lbl_artist.configure(text='')
+            self.lbl_album.configure(text='')
+            self.lbl_year.configure(text='')
+            self.lbl_genre.configure(text='')
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image='')
+            self.lbl_album_art.update()
+            return
+        self.lbl_title.configure(text=f'   Title:\t{t.title}')
+        self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
+        self.lbl_album.configure(text=f'   Album:\t{t.album}')
+        self.lbl_year.configure(text=f'   Year:\t{t.year}')
+        self.lbl_genre.configure(text=f'   Genre:\t{t.genre}')
+        if t.is_have_cover_art:
+            pil_image = Image.open(BytesIO(t.cover_art))
+            new_image = pil_image.resize((240, 240))
+            tk_image = ImageTk.PhotoImage(new_image)
+            self.lbl_album_art.image = tk_image
+            self.lbl_album_art.config(image=tk_image)
+        else:
+            self.lbl_album_art.image = None
+            self.lbl_album_art.config(image='')
+            self.lbl_album_art.update()
 
 
 def askdirectory():
@@ -115,7 +180,7 @@ def showinfo(result, info):
 
 class SongsUiFrame(FrameWithListbox):
     def __init__(self, frm_master, click_btn_read, click_btn_apply, click_btn_sort, file_type_option_changed,
-                 sort_by_option_changed):
+                 sort_by_option_changed, click_btn_add):
         super().__init__(frm_master)
 
         self.progress_bar = self.progressbar()
@@ -124,7 +189,7 @@ class SongsUiFrame(FrameWithListbox):
         self.btn_read = self.button(txt="Read folder content", cmd=click_btn_read)
         self.btn_apply = self.button(txt="Apply filter", cmd=click_btn_apply)
         self.btn_sort = self.button(txt="Sort songs", cmd=click_btn_sort)
-        self.btn_add_to_pl = self.button(txt='Add to playlist', cmd=None)
+        self.btn_add_to_pl = self.button(txt='Add to playlist', cmd=click_btn_add)
 
         self.ent_path = self.entry()
         self.ent_artist = self.entry()
@@ -180,42 +245,22 @@ class SongsUiFrame(FrameWithListbox):
         # Set default values
         self.ent_path.insert(0, 'Enter folder path..')
 
-    def draw_track_metadata(self, track=None):
-        t = track
-        if t is None:
-            self.lbl_title.configure(text='')
-            self.lbl_artist.configure(text='')
-            self.lbl_album.configure(text='')
-            self.lbl_year.configure(text='')
-            self.lbl_genre.configure(text='')
-            return
-        self.lbl_title.configure(text=f'   Title:\t{t.title}')
-        self.lbl_artist.configure(text=f'   Artist:\t{t.artist}')
-        self.lbl_album.configure(text=f'   Album:\t{t.album}')
-        self.lbl_year.configure(text=f'   Year:\t{t.year}')
-        self.lbl_genre.configure(text=f'   Genre:\t{t.genre}')
-        if t.is_have_cover_art:
-            pil_image = Image.open(BytesIO(t.cover_art))
-            new_image = pil_image.resize((240, 240))
-            tk_image = ImageTk.PhotoImage(new_image)
-            self.lbl_album_art.image = tk_image
-            self.lbl_album_art.config(image=tk_image)
-        else:
-            self.lbl_album_art.image = None
-            self.lbl_album_art.config(image='')
-            self.lbl_album_art.update()
-
 
 class PlaylistUiFrame(FrameWithListbox):
-    def __init__(self, frm_master):
+    def __init__(self, frm_master, click_btn_browse, click_btn_save):
         super().__init__(frm_master)
         self.ent_path = self.entry()
         self.ent_path.insert(0, 'Folder path to save')
-        self.btn_remove = self.button(txt='Remove', cmd=None)
+        self.btn_browse = self.button(txt='Browse', cmd=click_btn_browse)
+        self.btn_save = self.button(txt='Save Playlist', cmd=click_btn_save)
+        self.btn_remove = self.button(txt='Remove Item', cmd=None)
 
     def pack(self):
         super().pack()
         self.ent_path.pack(side=TOP)
+        self.btn_browse.pack()
+        self.btn_save.pack()
+        self.indent_on_buttons_frame()
         self.btn_remove.pack()
         self.indent_on_buttons_frame()
         self.lbl_title.pack()
@@ -224,6 +269,10 @@ class PlaylistUiFrame(FrameWithListbox):
         self.lbl_year.pack()
         self.lbl_genre.pack()
         self.lbl_album_art.pack()
+
+    def set_entry_text(self, txt):
+        self.ent_path.delete(0, 'end')
+        self.ent_path.insert(0, txt)
 
 
 class DownloadUiFrame(FrameWithListbox):

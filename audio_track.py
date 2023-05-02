@@ -7,7 +7,6 @@ class PlaylistItem:
     def __init__(self, track, is_added=False):
         self.track = track
         self.list_index = None
-        self.is_added = is_added
 
     def __repr__(self):
         return f"PlaylistItem({self.track.title}, {self.track.artist}, {self.track.album}, {self.track.album_artist}," \
@@ -93,10 +92,10 @@ class AudioTrackFlac(AudioTrack):
         self.file_type = 'flac'
         self.file_path = file_path
         self.audio = FLAC(file_path)
-        self.title = self.audio['TITLE'][0] if 'TITLE' in self.audio else None
-        self.artist = self.audio['ARTIST'][0] if 'ARTIST' in self.audio else None
-        self.album = self.audio['ALBUM'][0] if 'ALBUM' in self.audio else None
-        self.genre = self.audio['GENRE'][0] if 'GENRE' in self.audio else None
+        self.title = self.audio['TITLE'][0] if 'TITLE' in self.audio else ''
+        self.artist = self.audio['ARTIST'][0] if 'ARTIST' in self.audio else ''
+        self.album = self.audio['ALBUM'][0] if 'ALBUM' in self.audio else ''
+        self.genre = self.audio['GENRE'][0] if 'GENRE' in self.audio else ''
         self.year = self.audio['DATE'][0] if 'DATE' in self.audio else None
 
 
@@ -106,11 +105,11 @@ class AudioTrackMp3(AudioTrack):
         self.file_type = 'mp3'
         self.file_path = file_path
         self.audio = MP3(file_path)
-        self.title = self.audio['TIT2'].text[0] if 'TIT2' in self.audio else None
-        self.artist = self.audio['TPE1'].text[0] if 'TPE1' in self.audio else None
-        self.album = self.audio['TALB'].text[0] if 'TALB' in self.audio else None
-        self.album_artist = self.audio['TPE2'].text[0] if 'TPE2' in self.audio else None
-        self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else None
+        self.title = self.audio['TIT2'].text[0] if 'TIT2' in self.audio else ''
+        self.artist = self.audio['TPE1'].text[0] if 'TPE1' in self.audio else ''
+        self.album = self.audio['TALB'].text[0] if 'TALB' in self.audio else ''
+        self.album_artist = self.audio['TPE2'].text[0] if 'TPE2' in self.audio else ''
+        self.genre = self.audio['TCON'].text[0] if 'TCON' in self.audio else ''
         self.year = self.audio['TDRC'].text[0] if 'TDRC' in self.audio else None
         self.track_number = self.audio['TRCK'].text[0] if 'TRCK' in self.audio else None
         self.cover_art = self._read_cover_art()
