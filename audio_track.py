@@ -7,7 +7,6 @@ class PlaylistItem:
     def __init__(self, track, is_added=False):
         self.track = track
         self.list_index = None
-        self.is_added = is_added
 
     def __repr__(self):
         return f"PlaylistItem({self.track.title}, {self.track.artist}, {self.track.album}, {self.track.album_artist}," \

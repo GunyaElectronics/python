@@ -2,6 +2,8 @@ from dev_tools import get_file_names_in_folder
 from audio_track_ui import *
 from audio_track import *
 import threading
+import shutil
+import os
 
 
 def get_list_item_text(list_item):
@@ -154,7 +156,6 @@ class App:
         lst_item = self._get_selected_playlist_item(self.songs)
         if lst_item is None:
             return
-        lst_item.track.is_added = True
         self.songs.remove_selected_lst_item()
         self.songs.draw_track_metadata()
         self.playlist.insert_to_end_of_list(get_list_item_text(lst_item), lst_item.list_index)
@@ -166,7 +167,6 @@ class App:
         self.songs.remove_selected_lst_items()
         for itm in indexes:
             itm = self.audio_tracks_list[itm]
-            itm.track.is_added = True
             self.playlist.insert_to_end_of_list(get_list_item_text(itm), itm.list_index)
 
     def click_btn_browse(self):
@@ -174,9 +174,11 @@ class App:
         self.playlist.set_entry_text(self.playlist_path)
 
     def click_btn_save(self):
-        for f in self.audio_tracks_list:
-            if f.is_added:
-                print(f'Copy {f.track.file_path} to {self.playlist_path}')
+        for index in self.playlist.get_all_user_indexes():
+            full_path = self.audio_tracks_list[index].track.file_path
+            name = os.path.basename(full_path)
+            shutil.copy(full_path, f'{self.playlist_path}/{name}')
+            print(f'Copy "{name}" to the "{self.playlist_path}" folder')
 
 
 def main():

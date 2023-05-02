@@ -24,7 +24,7 @@ class DefaultMainUi(Tk):
         self.ntb_base.add(self.frm_tab_download, text='Download')
         self.ntb_base.add(self.frm_tab_edit, text='Edit')
         self.geometry('720x720')
-        self.title('Audio Metadata Analyzer V0.2')
+        self.title('Audio Metadata Analyzer V1.0')
 
     def pack(self):
         self.ntb_base.pack(fill='both', expand=True)
@@ -127,6 +127,9 @@ class FrameWithListbox(DefaultUiFrame):
         for sel in self.lst.curselection():
             lst.append(self._lst_user_indexes[sel])
         return lst
+
+    def get_all_user_indexes(self):
+        return self._lst_user_indexes
 
     def bind_select_lst_item_callback(self, callback):
         self.lst.bind('<<ListboxSelect>>', callback)
