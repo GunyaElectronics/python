@@ -127,4 +127,7 @@ class AudioTrackMp3(AudioTrack):
 
 
 def sort_audio_tracks_list(songs_list, sort_by):
-    return sorted(songs_list, key=operator.attrgetter(sort_by))
+    result = sorted(songs_list, key=operator.attrgetter(sort_by))
+    for index in range(len(result)):
+        result[index].list_index = index
+    return result
