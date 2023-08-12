@@ -252,13 +252,19 @@ class PlaylistUiFrame(FrameWithListbox):
         self.ent_path = self.entry()
         self.ent_path.insert(0, 'Folder path to save')
         self.btn_browse = self.button(txt='Browse', cmd=click_btn_browse)
+        self.ent_playlist_name = self.entry()
+        self.ent_playlist_name.insert(0, 'MyPlaylist')
         self.btn_save = self.button(txt='Save Playlist', cmd=click_btn_save)
-        self.btn_remove = self.button(txt='Remove Item', cmd=None)
+        self.btn_remove = self.button(txt='Clear Playlist', cmd=None)
+        self.progress_bar = self.progressbar()
+        self.progress_bar['value'] = 0
 
     def pack(self):
         super().pack()
+        self.progress_bar.pack(fill=BOTH)
         self.ent_path.pack(side=TOP)
         self.btn_browse.pack()
+        self.ent_playlist_name.pack()
         self.btn_save.pack()
         self.indent_on_buttons_frame()
         self.btn_remove.pack()
