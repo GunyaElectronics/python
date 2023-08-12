@@ -174,11 +174,28 @@ class App:
         self.playlist.set_entry_text(self.playlist_path)
 
     def click_btn_save(self):
-        for index in self.playlist.get_all_user_indexes():
-            full_path = self.audio_tracks_list[index].track.file_path
-            name = os.path.basename(full_path)
-            shutil.copy(full_path, f'{self.playlist_path}/{name}')
-            print(f'Copy "{name}" to the "{self.playlist_path}" folder')
+        p = '' if self.playlist_path is None else self.playlist_path
+        if not os.path.exists(p) or not os.path.isdir(p):
+            self.click_btn_browse()
+        new_folder_path = f'{self.playlist_path}/{self.playlist.ent_playlist_name.get()}'
+        os.makedirs(new_folder_path)
+
+        def copy_songs(app_self):
+            count_of_files = self.playlist.get_all_user_indexes()
+            playlist = self.playlist
+            for index in count_of_files:
+                full_path = self.audio_tracks_list[index].track.file_path
+                name = os.path.basename(full_path)
+                shutil.copy(full_path, f'{new_folder_path}/{name}')
+                percent = index * 100 / len(count_of_files)
+                if playlist.progress_bar['value'] != percent:
+                    playlist.progress_bar['value'] = percent
+            playlist.progress_bar['value'] = 100
+            showinfo("Success", f"{len(count_of_files)} files copied")
+            playlist.progress_bar['value'] = 0
+
+        thread = threading.Thread(target=copy_songs, args=(self,))
+        thread.start()
 
 
 def main():
