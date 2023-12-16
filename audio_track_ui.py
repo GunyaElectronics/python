@@ -197,9 +197,10 @@ class SongsUiFrame(FrameWithListbox):
         self.ent_genre = self.entry()
         self.ent_year = self.entry()
 
-        self.file_types_dict = {'Search all files': ['mp3', 'flac'],
+        self.file_types_dict = {'Search all files': ['mp3', 'flac', 'm4a'],
                                 'Search mp3 only': ['mp3'],
-                                'Search flac only': ['flac']
+                                'Search flac only': ['flac'],
+                                'Search m4a only': ['m4a']
                                 }
         self.file_types = self.file_types_dict['Search all files']
         self.file_type_options = list(self.file_types_dict.keys())

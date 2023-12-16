@@ -1,5 +1,6 @@
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
+from mutagen.mp4 import MP4
 import operator
 
 
@@ -97,6 +98,28 @@ class AudioTrackFlac(AudioTrack):
         self.album = self.audio['ALBUM'][0] if 'ALBUM' in self.audio else ''
         self.genre = self.audio['GENRE'][0] if 'GENRE' in self.audio else ''
         self.year = self.audio['DATE'][0] if 'DATE' in self.audio else None
+
+
+class AudioTrackM4a(AudioTrack):
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_type = 'm4a'
+        self.file_path = file_path
+        self.audio = MP4(file_path)
+        self.title = self.audio['©nam'][0] if '©nam' in self.audio else ''
+        self.artist = self.audio['©ART'][0] if '©ART' in self.audio else ''
+        self.album = self.audio['©alb'][0] if '©alb' in self.audio else ''
+        self.genre = self.audio['©gen'][0] if '©gen' in self.audio else ''
+        self.year = self.audio['©day'][0] if '©day' in self.audio else None
+        self.cover_art = self._read_cover_art()
+        self.is_have_cover_art = False if self.cover_art is None else True
+
+    def _read_cover_art(self):
+        try:
+            data = self.audio['covr'][0]
+        except KeyError:
+            data = None
+        return data
 
 
 class AudioTrackMp3(AudioTrack):
