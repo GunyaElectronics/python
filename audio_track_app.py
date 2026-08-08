@@ -105,7 +105,8 @@ class App:
                 if songs.progress_bar['value'] != percent:
                     songs.progress_bar['value'] = percent
                 audio_metadata_item = AudioTrackMp3(f'{folder_path}\\{audio_file}') if audio_file.endswith('mp3') else \
-                    AudioTrackFlac(f'{folder_path}\\{audio_file}')
+                    (AudioTrackFlac(f'{folder_path}\\{audio_file}') if audio_file.endswith('flac') else
+                     AudioTrackM4a(f'{folder_path}\\{audio_file}'))
                 play_list_item = PlaylistItem(audio_metadata_item)
                 play_list_item.list_index = file_index
                 app_self.audio_tracks_list.append(play_list_item)
